@@ -15,7 +15,7 @@ function InstructionBox({
 
     if (allPotionsTested) {
         instructionKey = 'ending'
-        message = 'I just tested all the potions I know!! The magic I gathered finally feels at home. I still have lots to learn though.. Perhaps this is only the beginning...'
+        message = 'I just tested all the potions I know!! The magic I gathered finally feels like home. I still have lots to learn though.. Perhaps this is only the beginning...'
     } else if (scene === 'lab') {
         if (!itemsFrozen) {
             instructionKey = 'lab-freeze'

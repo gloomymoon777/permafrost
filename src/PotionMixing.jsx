@@ -265,7 +265,7 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
                 back to lab
             </button>
 
-            <header className="header"><h1>- brewing 𖤐 cauldron - </h1><p>hover by opening your palm. grab items by making a fist, and release  (check book for recipes)</p></header>
+            <header className="header"><h1>- brewing 𖤐 cauldron - </h1><p>hover by opening your palm. grab ingredients by making a fist, and release over the bottle. then click stir! (check book for recipes)</p></header>
             
             <section className="content">
           <aside className="ingredients">
