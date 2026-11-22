@@ -1,0 +1,49 @@
+.instruction-box {
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: min(620px, 86vw);
+    min-width: min(280px, 86vw);
+    min-height: 76px;
+
+    box-sizing: border-box;
+    padding: 14px 14px;
+
+    display: flex;
+    align-items: center;
+
+    background: rgba(15, 18, 15, 0.458);
+    border: 2px solid rgba(230, 240, 225, 0.2);
+    border-radius: 0;
+
+    color: rgba(245, 245, 235, 0.85);
+
+    z-index: 1000;
+    pointer-events: none;
+
+    backdrop-filter: blur(2px);
+}
+
+.instruction-box p {
+    margin: 0;
+
+    font-family: inherit;
+    font-size: clamp(14px, 1vw, 17px);
+    line-height: 1;
+    letter-spacing: 0.2px;
+}
+
+.instruction-cursor {
+    display: inline-block;
+    margin-left: 3px;
+    opacity: 0.6;
+    animation: cursor-blink 0.8s steps(2, start) infinite;
+}
+
+@keyframes cursor-blink {
+    to {
+        visibility: hidden;
+    }
+}

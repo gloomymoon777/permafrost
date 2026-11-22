@@ -27,7 +27,7 @@ function Activate({ brewedPotions, onBack, onActivate }) {
 
                 {uniquePotions.length === 0 ? (
                     <p className="empty-potions">
-                        you haven't brewed any potions yet...
+                        no potions... enter the cauldron to brew some!
                     </p>
                 ) : (
                     <div className="potion-grid">

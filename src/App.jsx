@@ -7,6 +7,7 @@ import './App.css'
 import PotionMixing from './PotionMixing'
 import Freezer from './Freezer'
 import Activate from './Activate'
+import InstructionBox from './InstructionBox'
 
 import bottle from "./assets/bottle.png"
 import fern from "./assets/fern.png"
@@ -147,6 +148,13 @@ function App() {
               />
           </main>
       )}
+
+      <InstructionBox
+            scene={scene}
+            itemsFrozen={itemsFrozen}
+            brewedPotions={brewedPotions}
+            activatedPotions={activatedPotions}
+        />
     </>
   )
 }
