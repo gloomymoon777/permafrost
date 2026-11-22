@@ -31,6 +31,13 @@ function PotionMixing({onBack, ingredients, brewedPotions, setBrewedPotions}) {
         color: '#8acde0'
     },
     {
+    id: 'rain',
+    name: 'rainfall elixir',
+    description: 'summons a gentle rain, bringing nourishment and renewal to the world.',
+    ingredients: ['mushroom', 'crystal'],
+    color: '#79b9d1'
+    },
+    {
         id: 'luminescence',
         name: 'luminescence nectar',
         description: 'glows softly in the dark, revealing things hidden from the naked eye.',

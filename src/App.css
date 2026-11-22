@@ -307,3 +307,55 @@
         transform: translate(-5%, -4%) scale(1.1);
     }
 }
+
+.effect-rain {
+    overflow: hidden;
+}
+
+.rain-drop {
+    position: absolute;
+    top: -100px;
+    left: var(--x);
+
+    width: 15px;
+    height: var(--length);
+
+    pointer-events: none;
+
+    animation: rain-drop-fall var(--duration) linear var(--delay) infinite;
+}
+
+.rain-stem {
+    width: 1px;
+    height: 100%;
+
+    margin-left: 7px;
+
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(168, 223, 242, 0.5)
+    );
+
+    box-shadow: 0 0 4px rgba(130, 205, 235, 0.2);
+}
+
+@keyframes rain-drop-fall {
+    0% {
+        transform: translate(0, -10vh);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.8;
+    }
+
+    75% {
+        opacity: 0.65;
+    }
+
+    100% {
+        transform: translate(var(--drift), 110vh);
+        opacity: 0;
+    }
+}

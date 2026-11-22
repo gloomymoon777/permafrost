@@ -107,27 +107,41 @@ function App() {
         </button>
 
         {activatedPotions.map(potion => (
-            <div
-                key={potion.id}
-                className={`potion-effect effect-${potion.id}`}
-            >
-                {['frost', 'evergreen', 'luminescence'].includes(potion.id) &&
-                  Array.from({ length: 35 }).map((_, i) => (
-                      <span
-                          key={i}
-                          style={{
-                              '--x': `${25 + ((i * 37) % 50)}%`,
-                              '--y': `${30 + ((i * 61) % 45)}%`,
-                              '--delay': `${-((i * 13) % 15)}s`,
-                              '--duration': `${16 + (i * 7) % 12}s`,
-                              '--drift': `${((i * 37) % 241) - 120}px`,
-                              '--size': `${2 + (i * 5) % 3}px`
-                          }}
-                      />
+          <div key={potion.id} className={`potion-effect effect-${potion.id}`}>
+
+              {['frost', 'evergreen', 'luminescence'].includes(potion.id) &&
+                  Array.from({length: 35}).map((_, i) => (
+                      <span key={i} style={{
+                          '--x': `${25 + ((i * 37) % 50)}%`,
+                          '--y': `${30 + ((i * 61) % 45)}%`,
+                          '--delay': `${-((i * 13) % 15)}s`,
+                          '--duration': `${16 + (i * 7) % 12}s`,
+                          '--drift': `${((i * 37) % 241) - 120}px`,
+                          '--size': `${2 + (i * 5) % 3}px`
+                      }}/>
                   ))
               }
-            </div>
-        ))}
+
+            {potion.id === 'rain' && (
+                Array.from({ length: 100 }).map((_, i) => (
+                    <div
+                        key={i}
+                        className="rain-drop"
+                        style={{
+                            '--x': `${(i * 37) % 100}%`,
+                            '--delay': `${-((i * 17) % 20) / 10}s`,
+                            '--duration': `${0.65 + (i * 13 % 50) / 100}s`,
+                            '--drift': `${15 + (i * 7 % 15)}px`,
+                            '--length': `${35 + (i * 11 % 35)}px`
+                        }}
+                    >
+                        <div className="rain-stem" />
+                    </div>
+                ))
+            )}
+
+        </div>
+    ))}
       </main>
     
     )}
