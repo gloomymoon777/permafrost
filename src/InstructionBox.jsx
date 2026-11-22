@@ -8,14 +8,13 @@ function InstructionBox({
     brewedPotions,
     allPotionsTested,
     isStirring
-})  {
-
+}) {
     let message = ''
     let instructionKey = ''
 
     if (allPotionsTested) {
         instructionKey = 'ending'
-        message = 'I just tested all the potions I know!! The magic I gathered finally feels like home. I still have lots to learn though.. Perhaps this is only the beginning...'
+        message = 'I just tested all the potions I know!! The magic I gathered finally feels like home. I still have lots to learn though.. Perhaps this is only the beginning... // congrats!! you finished the game! thanks for playingg :)'
     } else if (scene === 'lab') {
         if (!itemsFrozen) {
             instructionKey = 'lab-freeze'
@@ -29,20 +28,28 @@ function InstructionBox({
         }
     } else if (scene === 'mixing' && isStirring) {
         instructionKey = 'mixing-stir'
-        message = 'The ingredients are ready! point your index finger at the brew and move it in a circle until the meter fills!'
+        message = 'The ingredients are ready! Point your index finger at the brew and move it in a circle until the meter fills!'
     }
 
     const [displayedText, setDisplayedText] = useState('')
     const [visible, setVisible] = useState(false)
-    const [seenInstructions, setSeenInstructions] = useState([])
     const [skipped, setSkipped] = useState(false)
     const [textComplete, setTextComplete] = useState(false)
 
+    // Stores completed instructions without causing unnecessary re-renders
+    const seenInstructions = useRef(new Set())
     const timerRef = useRef(null)
 
     // Typewriter effect
     useEffect(() => {
-        if (!message || skipped || seenInstructions.includes(instructionKey)) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+
+        if (
+            !message ||
+            skipped ||
+            seenInstructions.current.has(instructionKey)
+        ) {
             setVisible(false)
             return
         }
@@ -52,8 +59,6 @@ function InstructionBox({
         setTextComplete(false)
 
         let index = 0
-
-        clearInterval(timerRef.current)
 
         timerRef.current = setInterval(() => {
             index++
@@ -70,33 +75,24 @@ function InstructionBox({
             clearInterval(timerRef.current)
             timerRef.current = null
         }
+    }, [instructionKey, message, skipped])
 
-    }, [instructionKey, message, seenInstructions, skipped])
-
-    // Click anywhere to reveal, then click again to dismiss
+    // First click reveals all text; second click dismisses it
     useEffect(() => {
         if (!visible) return
 
         function handleClick(e) {
-            // Let the SKIP ALL button handle its own click
             if (e.target.closest?.('.skip-instructions')) return
 
             if (!textComplete) {
-                // First click: reveal the entire message
                 clearInterval(timerRef.current)
                 timerRef.current = null
 
                 setDisplayedText(message)
                 setTextComplete(true)
-
             } else {
-                // Second click: dismiss the message
+                seenInstructions.current.add(instructionKey)
                 setVisible(false)
-
-                setSeenInstructions(prev => {
-                    if (prev.includes(instructionKey)) return prev
-                    return [...prev, instructionKey]
-                })
             }
         }
 
@@ -105,7 +101,6 @@ function InstructionBox({
         return () => {
             window.removeEventListener('pointerdown', handleClick)
         }
-
     }, [visible, textComplete, message, instructionKey])
 
     function skipInstructions(e) {
