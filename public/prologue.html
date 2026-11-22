@@ -83,7 +83,7 @@
     position: absolute; 
     width: 14vmin; 
     height: 14vmin; 
-    opacity: 0.6;
+    opacity: 0.4;
     transform: translate(-50%,-50%); 
     transition: all .4s 
   }
@@ -183,10 +183,165 @@
     line-height: 1.8; 
     color: #d8b4fe 
   }
+
+/* INTRO PAGES */
+#introScreens {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: transparent;
+}
+
+.introPage {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+}
+
+.introPage h1 {
+  position: absolute;
+  top: 15%;
+  width: 100%;
+  color: #d8b4fe;
+  font-size: clamp(22px, 5vmin, 48px);
+}
+
+.introPage .dialogueBox {
+  position: absolute;
+  left: 50%;
+  bottom: 3vmin;
+  transform: translateX(-50%);
+  width: min(110vmin, 92vw);
+  box-sizing: border-box;
+  background: #1e1b4b;
+  border: 4px solid #fff;
+  box-shadow: inset 0 0 0 3px #4c1d95, 0 0 0 4px #000;
+  padding: 2vmin 2.6vmin;
+  font-size: clamp(10px, 1.9vmin, 18px);
+  line-height: 1.8;
+  min-height: 15vmin;
+}
+
+.introPage button {
+  margin-top: 2vmin;
+  padding: 1.5vmin 3vmin;
+  background: #6b4c9a;
+  color: white;
+  border: 3px solid white;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.teamNames {
+  color: #d8b4fe;
+  margin: 4vmin 0;
+  font-size: clamp(10px, 1.8vmin, 16px);
+}
+
+.introPage button {
+  margin-top: 3vmin;
+  padding: 2vmin 4vmin;
+  background: #6b4c9a;
+  color: white;
+  border: 3px solid white;
+  font-family: inherit;
+  font-size: clamp(10px, 1.8vmin, 16px);
+  cursor: pointer;
+}
+
+.introPage button:hover {
+  background: #a855f7;
+  transform: scale(1.05);
+}
 </style>
 </head>
 
 <body>
+  <!-- INTRO AND BACKSTORY -->
+<div id="introScreens">
+  <!-- TITLE PAGE -->
+  <div id="titlePage" class="introPage">
+    <h1>Permafrost & Potions</h1>
+    <h2>A Witch's Guide to Success</h2>
+    <div class="teamNames">
+      Created by: Isabel, Jaylyn, and Vedanti
+    </div>
+    <button onclick="playClick(); playMusic('intro'); showIntroPage('storyPage1')">
+      Let's Go!
+    </button>
+  </div>
+
+  <!-- BACKSTORY PART 1 -->
+  <div id="storyPage1" class="introPage hidden">
+    <h1>Time to Explore!</h1>
+    <div class="dialogueBox">
+      Once upon a time, in a kingdom far, far away,
+      lived an ice witch in a tower.
+
+      She decided to venture into the enchanted forest
+      to gather more ingredients for her potions.
+    <br>
+    <button onclick="playClick(); showIntroPage('storyPage2')">
+      Continue
+    </button>
+    </div>
+
+  </div>
+
+
+  <!-- BACKSTORY PART 2 -->
+  <div id="storyPage2" class="introPage hidden">
+    <h1>The Frozen Forest</h1>
+    <div class="dialogueBox">
+      She realized that the forest had been iced over
+      by the global freezing.
+
+      She decided to collect frozen organisms to use
+      in her potions. Once she got home, she covered
+      them with a special type of frost so that they
+      would become enchanted.
+    <br>
+    <button onclick="playClick(); showIntroPage('storyPage3')">
+      Continue
+    </button>
+    </div>
+
+  </div>
+
+
+  <!-- BACKSTORY PART 3 -->
+  <div id="storyPage3" class="introPage hidden">
+    <h1>Back to the Laboratory</h1>
+    <div class="dialogueBox">
+      Once she finished collecting the ingredients,
+      she placed them in her laboratory to begin
+      brewing her potions.
+
+      But what kind of magic would she create?
+    <br>
+    <button onclick="playClick(); showIntroPage('forestPage')">
+      Continue
+    </button>
+    </div>
+
+  </div>
+
+
+  <!-- FINAL PAGE -->
+  <div id="forestPage" class="introPage hidden">
+    <h1>Your Journey Begins</h1>
+    <p>
+      Collect the ingredients and help the ice witch
+      restore her magical world!
+    </p>
+
+    <button onclick="playClick(); beginGame()">
+      Go to the Forest
+    </button>
+
+  </div>
+
+</div>
 <video id="webcam" muted playsinline></video>
 <canvas id="cameraView" class="layer"></canvas>
 
@@ -233,6 +388,32 @@
 <!-- ICKY GOOGLE MATH -->
 <script>
 const $ = id => document.getElementById(id);
+// BACKGROUND MUSIC
+const musicTracks = {
+  intro: new Audio('assets/Sounds/intro.mp3'),
+  forest: new Audio('assets/Sounds/forest.mp3'),
+  laboratory: new Audio('assets/Sounds/laboratory.mp3')
+};
+let currentMusic = null;
+// Set the music volume and enable looping
+Object.values(musicTracks).forEach(track => {
+  track.loop = true;
+  track.volume = 0.18;
+});
+
+function playMusic(name) {
+  const nextTrack = musicTracks[name];
+  // Stop previous
+  if (currentMusic) {
+    currentMusic.pause();
+    currentMusic.currentTime = 0;
+  }
+  // Start new
+  currentMusic = nextTrack;
+  currentMusic.play().catch(error => {
+    console.log('Music could not play:', error);
+  });
+}
 const webcam = $('webcam'), cameraView = $('cameraView'), handLayer = $('handLayer');
 const cameraPen = cameraView.getContext('2d'), handPen = handLayer.getContext('2d');
 const counter = $('counter'), recipeBook = $('recipeBook'), speech = $('speech');
@@ -240,6 +421,12 @@ const stirMeter = $('stirMeter'), stirFill = $('stirFill');
 const potionResult = $('potionResult'), potionName = $('potionName'), potionLine = $('potionLine');
 const ingredientLayer = $('ingredients');
 const backdrops = document.querySelectorAll('.backdrop');
+const clickSound = new Audio('assets/Sounds/click.mp3');
+
+function playClick() {
+  clickSound.currentTime = 0;
+  clickSound.play();
+}
 
 const FOREST = 0, TOWER = 1, LAB = 2;
 const TOWER_SECONDS = 4;
@@ -342,7 +529,7 @@ function backdrop(which, fade) {
 function place(item, spot) {
   [item.x, item.y] = spot;
   item.el.classList.remove('carried');
-  item.el.style.cssText = `left:${item.x * 100}%; top:${item.y * 100}%; opacity:1; transform:translate(-50%,-50%)`;
+  item.el.style.cssText = `left:${item.x * 100}%; top:${item.y * 100}%; opacity:0.4; transform:translate(-50%,-50%)`;
 }
 
 function vanish(item) {
@@ -354,6 +541,7 @@ function resetStir() { progress = 0; streak = 0; dir = 0; paid = 0; lastAngle = 
 
 
 function startForest() {
+  playMusic('forest');
   show('forestScene');
   backdrop(FOREST, GAME_FADE);
   startCamera();
@@ -408,6 +596,7 @@ function startTower() {
   }
 
 function startLab() {
+  playMusic('laboratory')
   show('laboratoryScene');
   backdrop(LAB, GAME_FADE);
   startCamera();
@@ -549,64 +738,30 @@ function pauseCamera() {
   handPen.clearRect(0, 0, handLayer.width, handLayer.height);
 }
 
-startForest();
+// Intro and backstory change
+function showIntroPage(pageId) {
+
+  const pages = document.querySelectorAll('.introPage');
+
+  pages.forEach(page => {
+    page.classList.add('hidden');
+  });
+
+  $(pageId).classList.remove('hidden');
+}
+
+
+// Starting the game
+function beginGame() {
+
+  $('introScreens').classList.add('hidden');
+
+  startForest();
+
+}
+
 </script>
 </body>
-</html>
-<!--Front Page-->
-<section id="frontPage">
-  <h1>Permafrost & Potions</h1>
-  <h3>A Witch's Guide to Success</h3>
-</section>
-
-<!--Backstory-->
-<section id="storyScene1" class="scene active">
-  <h1> Time to Explore! </h1>
-  <p> Once upon a time, in a kingdom far, far away, lived an ice witch
-    who lived in a tower.
-    She decided to venture into the enchanted forest to gather more ingredients for her potions.
-  </p>
-  <button id="beginJourney">
-    Continue
-  </button>
-</section>
-
-<section id="storyScene2" class="scene active">
-  <p> She realized that the forest had been iced over by the global freezing. She decided to collect frozen organisms to use in her potions. Once she got home she covered them with a special type of frost so that they are 
-    enchanted. </p>
-  <button id="beginJourney">
-    Continue
-  </button>
-</section>
-
-<section id="storyScene3" class="scene active">
-  <p> Once she finished, she placed them in her laboratory to begin brewing her potions. </p>
-  <button id="beginJourney">
-    Continue to Forest
-  </button>
-</section>
-
-<!--Forest-->
-<section id="forestScene" class="scene">
-  <h1>The Enchanted Forest </h1>
-  <div id="cameraContainer">
-    <video id="cameraFeed" autoplay playsinline></video>
-    <canva></canva>
-  </div>
-
-  <p id="collectionMessage">
-    Search the forest for ingredients.
-  </p>
-
-  <button id="enterTower">
-    Enter Tower
-  </button>
-</section>
-
-<!--Tower-->
-<section id="towerScene">
-</section>
-
 <script type="module" src="js/script.js"></script>
 <script type="module" src="/src/main.jsx"></script>
 </html> 
