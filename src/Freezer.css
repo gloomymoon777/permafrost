@@ -1,0 +1,99 @@
+
+.freezer-scene {
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 35px;
+    position: relative;
+    background: rgba(110, 165, 190, 0.25);
+}
+
+.freezer-back {
+    background: rgba(255,255, 255,0.8);
+    font-family: inherit;
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    left: 70px;
+    top: 50px;
+}
+
+.freezer-header {
+    text-align: center;
+    padding-top: 15px;
+}
+
+.freezer-header h1 {
+    font-size: 24px;
+    font-weight: normal;
+}
+
+.freezer-header p {
+    font-size: 16px;
+}
+
+.freezer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 65px;
+}
+
+.freezer-ingredients {
+    display: grid;
+    grid-template-columns: repeat(3, 140px);
+    justify-content: center;
+    gap: 35px 55px;
+}
+
+.freezer-ingredient {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.freezer-image {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.freezer-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.freezer-blue-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(110, 205, 245, 0.85);
+
+    mask-image: var(--ingredient-image);
+    -webkit-mask-image: var(--ingredient-image);
+    mask-size: 100% 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+.freezer-ingredient p {
+    font-size: 16px;
+}
+
+.freeze-button {
+   background: rgba(255,255, 255,0.8);
+  font-family: inherit;
+  font-size: 20px;
+   cursor: pointer;
+   margin: 20px;
+}
+
+.freeze-message {
+    font-size: 16px;
+    margin-top: 15px;
+}

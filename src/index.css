@@ -1,0 +1,11 @@
+
+
+@font-face {
+    font-family: "JoganSoft";
+    src: url('./assets/JoganSoft.otf') format('opentype');
+}
+
+body {
+  margin: 0;
+  font-family: "JoganSoft";
+}

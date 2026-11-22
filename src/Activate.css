@@ -1,0 +1,84 @@
+.activate-scene {
+    min-height: 100vh;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 35px;
+    position: relative;
+    background: rgba(115, 155, 105, 0.3);
+}
+
+.activate-back {
+   background: rgba(255,255, 255,0.8);
+    font-family: inherit;
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    left: 70px;
+    top: 50px;
+}
+
+.activate-header {
+    text-align: center;
+    padding-top: 15px;
+}
+
+
+.activation-list {
+    width: min(850px, 90%);
+    max-height: 65vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 25px;
+    margin: 45px auto 0;
+    text-align: center;
+}
+
+.activation-list h2 {
+    font-size: 20px;
+    font-weight: normal;
+    margin: 0 0 20px;
+}
+
+.potion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 15px;
+}
+
+.activation-potion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(107, 107, 107, 0.25);
+}
+
+.activation-potion h3,
+.activation-potion p,
+.activation-potion span {
+    margin: 0;
+}
+
+.activation-potion p {
+    min-height: 45px;
+}
+
+.activation-potion span {
+    opacity: 0.8;
+}
+
+.sigil-button {
+    font-family: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+
+.empty-potions {
+    font-size: 16px;
+}
