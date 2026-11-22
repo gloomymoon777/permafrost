@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 
 import './App.css'
@@ -8,7 +8,8 @@ import PotionMixing from './PotionMixing'
 import Freezer from './Freezer'
 import Activate from './Activate'
 import InstructionBox from './InstructionBox'
-
+import Trace from './Trace'
+import HandCamera from './HandCamera'
 import bottle from "./assets/bottle.png"
 import fern from "./assets/fern.png"
 import crystal from "./assets/crystal.png"
@@ -24,7 +25,7 @@ function App() {
     const [itemsFrozen, setItemsFrozen] = useState(false)
     const [testedPotions, setTestedPotions] = useState([])
 
-  
+
   const ingredients = [
     {id: 'fern', name: 'fern', image: fern, frozen: itemsFrozen, color: '#3e5932'},
     {id: 'crystal', name: 'crystal', image: crystal, frozen: itemsFrozen, color: '#a8c3cb'},
@@ -36,7 +37,24 @@ function App() {
   const [scene, setScene] = useState('lab')
   const [brewedPotions, setBrewedPotions] = useState([])
   const [activatedPotions, setActivatedPotions] = useState([])
+  const [pendingPotion, setPendingPotion] = useState(null)
+  const hover = useRef({ el: null, timer: null })
 
+  // hold your hand over a lab button for one second to press it
+  function pointWithHand(hand) {
+    const found = hand ? document.elementFromPoint(hand.x, hand.y) : null
+    const button = found?.closest('.buttons') || null
+    if (button === hover.current.el) return
+    clearTimeout(hover.current.timer)
+    hover.current.el = button
+    if (button) hover.current.timer = setTimeout(() => button.click(), 1000)
+  }
+
+  // drawing the sigil first: the spell only goes off after the glyph is traced
+  function startTrace(potion) {
+    setPendingPotion(potion)
+    setScene('trace')
+  }
 
   function activatePotion(potion) {
     setBrewedPotions(prev => {
@@ -90,6 +108,7 @@ function App() {
           backgroundImage: `url(${backgroundimg})`
         }}
       >
+        <HandCamera onHand={pointWithHand} />
         <header className="header">
            <h1> - tower 𖤐 lab - </h1>
         </header>
@@ -107,6 +126,7 @@ function App() {
         </button>
 
         {activatedPotions.map(potion => (
+<<<<<<< HEAD
           <div key={potion.id} className={`potion-effect effect-${potion.id}`}>
 
               {['frost', 'evergreen', 'luminescence'].includes(potion.id) &&
@@ -119,6 +139,25 @@ function App() {
                           '--drift': `${((i * 37) % 241) - 120}px`,
                           '--size': `${2 + (i * 5) % 3}px`
                       }}/>
+=======
+            <div
+                key={potion.id}
+                className={`potion-effect effect-${potion.id}`}
+            >
+                {['frost', 'evergreen', 'luminescence'].includes(potion.id) &&
+                  Array.from({ length: 35 }).map((_, i) => (
+                      <span
+                          key={i}
+                          style={{
+                              '--x': `${25 + ((i * 37) % 50)}%`,
+                              '--y': `${30 + ((i * 61) % 45)}%`,
+                              '--delay': `${-((i * 13) % 15)}s`,
+                              '--duration': `${16 + (i * 7) % 12}s`,
+                              '--drift': `${((i * 17) % 50) - 25}px`,
+                              '--size': `${2 + (i * 5) % 3}px`
+                          }}
+                      />
+>>>>>>> e67bceefeb0344c72c5cb59534dc620897590e71
                   ))
               }
 
@@ -174,9 +213,16 @@ function App() {
               <Activate
                   brewedPotions={brewedPotions}
                   onBack={() => setScene('lab')}
-                  onActivate={activatePotion}
+                  onActivate={startTrace}
               />
           </main>
+      )}
+
+      {scene === 'trace' && (
+          <Trace
+              onDone={() => activatePotion(pendingPotion)}
+              onBack={() => setScene('activate')}
+          />
       )}
 
       <InstructionBox
