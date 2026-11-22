@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permafrost &amp; Potions</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Press Start 2P', monospace; color: #fff }
+  .layer { position: absolute; inset: 0; width: 100%; height: 100% }
+  .hidden { display: none }
+
+  #cameraView, #handLayer { transform: scaleX(-1); object-fit: cover }
+  #cameraView { z-index: 1 }
+  #backdrops  { z-index: 2 }
+  #forestScene, #towerScene, #laboratoryScene { z-index: 3 }
+  #ingredients { z-index: 4 }
+  #handLayer { z-index: 5; pointer-events: none }
+  #hud { z-index: 6; pointer-events: none }
+
+  #webcam { position: absolute; width: 100%; height: 100%; opacity: 0 }
+
+  .backdrop { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; transition: opacity 1s }
+  .backdrop.showing { display: block }
+
+  .ingredient { position: absolute; width: 14vmin; height: 14vmin; transform: translate(-50%,-50%); transition: all .4s }
+  .ingredient.carried { transition: none; filter: drop-shadow(0 0 14px #a855f7) }
+
+  #cauldron { position: absolute; left: 50%; top: 62%; width: 32vmin; height: 32vmin; transform: translate(-50%,-50%) }
+
+  #stirMeter { position: absolute; left: 50%; top: 80%; width: min(40vmin, 60vw); height: 3vmin; transform: translateX(-50%);
+               border: 4px solid #fff; background: #1e1b4b; overflow: hidden }
+  #stirFill { width: 0%; height: 100%; background: #a855f7 }
+
+  #counter, #recipeBook { position: absolute; top: 2vmin; background: #1e1b4b; border: 4px solid #fff }
+  #counter { left: 50%; transform: translateX(-50%); font-size: clamp(12px, 2.2vmin, 22px); padding: 1.2vmin 2.2vmin }
+  #recipeBook { right: 2vmin; font-size: clamp(8px, 1.4vmin, 13px); padding: 1.4vmin 1.8vmin; line-height: 1.8 }
+
+  #speech { position: absolute; left: 50%; bottom: 3vmin; transform: translateX(-50%); width: min(110vmin, 92vw); box-sizing: border-box;
+            background: #1e1b4b; border: 4px solid #fff; box-shadow: inset 0 0 0 3px #4c1d95, 0 0 0 4px #000;
+            padding: 2vmin 2.6vmin; font-size: clamp(10px, 1.9vmin, 18px); line-height: 1.8; min-height: 9vmin }
+
+  #potionResult { position: absolute; left: 50%; top: 36%; transform: translate(-50%,-50%); text-align: center; width: max-content; max-width: 90vw; box-sizing: border-box;
+                  background: #1e1b4b; border: 4px solid #a855f7; box-shadow: 0 0 0 4px #000; padding: 2.5vmin 4vmin }
+  #potionName { font-size: clamp(16px, 3.4vmin, 36px); line-height: 1.5 }
+  #potionLine { font-size: clamp(9px, 1.7vmin, 16px); margin-top: 1.6vmin; line-height: 1.8; color: #d8b4fe }
+</style>
+</head>
+
+<body>
+
+<video id="webcam" muted playsinline></video>
+<canvas id="cameraView" class="layer"></canvas>
+
+<div id="backdrops" class="layer">
+  <img class="backdrop" src="https://i.pinimg.com/736x/45/3c/1b/453c1b0f22cf56cae4aa3409eab1dd98.jpg">
+  <img class="backdrop" src="https://i.pinimg.com/736x/22/d7/07/22d707269b80ec7893c3003e4009dcca.jpg">
+  <img class="backdrop" src="https://i.pinimg.com/736x/74/2e/0f/742e0fd21faeb32d396337729cd16b74.jpg">
+</div>
+
+<section id="forestScene" class="layer"></section>
+<section id="towerScene" class="layer hidden"></section>
+
+<section id="laboratoryScene" class="layer hidden">
+  <img id="cauldron" src="assets/bottle.png">
+</section>
+
+<!-- the same five pictures are used twice: scattered in the forest, then on the lab shelf -->
+<div id="ingredients" class="layer hidden">
+  <img id="cauldron" src="/assets/bottle.png">
+
+    <img class="ingredient" data-name="sap" src="/assets/sap.png">
+    <img class="ingredient" data-name="blossom" src="/assets/blossom.png">
+    <img class="ingredient" data-name="fern" src="/assets/fern.png">
+    <img class="ingredient" data-name="mushroom" src="/assets/mushroom.png">
+    <img class="ingredient" data-name="crystal" src="/assets/crystal.png">
+</div>
+
+<canvas id="handLayer" class="layer"></canvas>
+
+<div id="hud" class="layer">
+  <div id="counter" class="hidden"></div>
+  <div id="recipeBook" class="hidden"></div>
+  <div id="stirMeter" class="hidden"><div id="stirFill"></div></div>
+  <div id="speech" class="hidden"></div>
+  <div id="potionResult" class="hidden">
+    <div id="potionName"></div>
+    <div id="potionLine"></div>
+  </div>
+</div>
+
+<!-- GOOGLE REPO CODEEEEEEE  -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+<!-- ICKY GOOGLE MATH -->
+
+<script>
+const $ = id => document.getElementById(id);
+const webcam = $('webcam'), cameraView = $('cameraView'), handLayer = $('handLayer');
+const cameraPen = cameraView.getContext('2d'), handPen = handLayer.getContext('2d');
+const counter = $('counter'), recipeBook = $('recipeBook'), speech = $('speech');
+const stirMeter = $('stirMeter'), stirFill = $('stirFill');
+const potionResult = $('potionResult'), potionName = $('potionName'), potionLine = $('potionLine');
+const ingredientLayer = $('ingredients');
+const backdrops = document.querySelectorAll('.backdrop');
+
+const FOREST = 0, TOWER = 1, LAB = 2;
+const TOWER_SECONDS = 4;
+const GAME_FADE = 0.4;
+
+const FOREST_SPOTS = [[.15,.25], [.35,.12], [.65,.12], [.85,.25], [.80,.62]];
+const SHELF_SPOTS  = [[.10,.20], [.28,.15], [.50,.13], [.72,.15], [.90,.20]];
+
+// story: a beginner ice witch, a frozen forest, and a lot of frozen animals
+const STORY = {
+  forestStart: "I'm out of everything, and the whole forest has frozen solid. I need five ingredients.",
+  grab: {
+    sap:      "Sap, still sticky under the ice.",
+    blossom:  "A blossom. Somehow it survived the frost.",
+    fern:     "Fern. Smells like spring.",
+    mushroom: "Mushroom. I hope it's the safe kind.",
+    crystal:  "A frost crystal. Of course. My own fault."
+  },
+  forestDone: "That's all five. Back to the tower.",
+  tower: ["Home. Cold, quiet, a little on fire.", "Let's see if I remember school."],
+  lab: "Let's see what happens if I mix these.",
+  drop: "In it goes.",
+  again: "Again. Maybe something different this time."
+};
+
+const RECIPES = {
+  'blossom+sap':        { name: 'Spring Honey',   line: 'The frozen fox shakes off its frost and licks your hand.' },
+  'fern+sap':           { name: 'Thaw Tonic',     line: "A frozen rabbit twitches. It's breathing. Hello, rabbit." },
+  'blossom+fern':       { name: 'Spring Tea',     line: 'A frozen squirrel wakes up and wants a refill.' },
+  'fern+mushroom':      { name: 'Forest Fizz',    line: 'A frozen deer blinks once, then bolts into the trees.' },
+  'blossom+mushroom':   { name: 'Giggle Brew',    line: 'The frozen owl hoots. It sounds a lot like laughing.' },
+  'blossom+crystal':    { name: 'Moonlight Mist', line: 'Snow falls upwards for a moment. Nothing thaws, but it is pretty.' },
+  'crystal+fern':       { name: 'Deep Freeze',    line: 'Oops. The rabbit is frozen again, and colder this time.' },
+  'crystal+sap':        { name: 'Glass Amber',    line: 'The whole cauldron sets solid. You cannot even stir it.' },
+  'crystal+mushroom':   { name: 'Bad Idea',       line: 'It hums. You decide not to drink it.' },
+  'mushroom+sap':       { name: 'Sticky Business', line: 'Everything it touches gets stuck. The bear is stuck, but warm.' },
+  'blossom+fern+sap':   { name: 'Elixir of Spring', line: 'Every frozen animal in this part of the forest wakes up.' },
+  'blossom+crystal+fern+mushroom+sap': { name: 'THE GREAT THAW', line: 'The ice cracks everywhere at once. The whole forest wakes up.' }
+};
+
+// distances scale with the window so it plays the same on any laptop screen
+let GRAB, LAB_GRAB, REACH, MIN_REACH, POT_MOUTH;
+function measure() {
+  const s = Math.min(innerWidth, innerHeight) / 900;
+  GRAB = 150 * s;                    // forest: how close your fist has to be to an item
+  LAB_GRAB = 230 * s;                // lab shelf: bigger, so items are easier to pick up
+  REACH = 350 * s;                   // your hand must be between REACH and MIN_REACH from the cauldron
+  MIN_REACH = 50 * s;
+  POT_MOUTH = 340 * s;               // open your hand this close to drop something in
+}
+measure();
+addEventListener('resize', measure);
+
+const TURNS = 1.5;
+const GOAL = 2 * Math.PI * TURNS;
+const DRAIN = 0.004;                 // shaky hands shouldn't count
+const LEAD = 0.8;                    // radians one way before a stir starts counting
+
+let scene = 'forestScene';
+let items = [], left = [], shelf = [], inPot = [], held = null;
+let discovered = {}, progress = 0;
+let streak = 0, dir = 0, paid = 0, lastAngle = null, lastDist = 0;
+let busy = false, timer, speechTimer, typer;
+
+for (const el of document.querySelectorAll('.ingredient')) {
+  items.push({ el, name: el.dataset.name, x: 0, y: 0 });
+}
+
+const dist = (x1, y1, x2, y2) => Math.hypot(x1 - x2, y1 - y2);
+const potX = () => innerWidth / 2;
+const potY = () => innerHeight * 0.62;
+
+// fist: every fingertip closer to the wrist than its own middle knuckle
+function isFist(hand) {
+  return [[8,6], [12,10], [16,14], [20,18]].every(([t, k]) =>
+    dist(hand[t].x, hand[t].y, hand[0].x, hand[0].y) < dist(hand[k].x, hand[k].y, hand[0].x, hand[0].y));
+}
+
+// dialogue types out one letter at a time, then stays for a few seconds
+function say(text, seconds) {
+  clearInterval(typer);
+  clearTimeout(speechTimer);
+  speech.textContent = '';
+  speech.classList.remove('hidden');
+  let letters = 0;
+  typer = setInterval(() => {
+    speech.textContent = text.slice(0, ++letters);
+    if (letters >= text.length) {
+      clearInterval(typer);
+      speechTimer = setTimeout(() => speech.classList.add('hidden'), seconds * 1000);
+    }
+  }, 25);
+}
+
+function hideSpeech() {
+  clearInterval(typer);
+  clearTimeout(speechTimer);
+  speech.classList.add('hidden');
+}
+
+function show(id) {
+  scene = id;
+  for (const s of document.querySelectorAll('section')) s.classList.toggle('hidden', s.id !== id);
+}
+
+function backdrop(which, fade) {
+  backdrops.forEach((img, i) => {
+    img.classList.toggle('showing', i === which);
+    img.style.opacity = fade;
+    img.style.filter = fade < 1 ? 'brightness(0.8)' : 'none';
+    img.style.objectFit = which === TOWER ? 'contain' : 'cover';
+  });
+}
+
+function place(item, spot) {
+  [item.x, item.y] = spot;
+  item.el.classList.remove('carried');
+  item.el.style.cssText = `left:${item.x * 100}%; top:${item.y * 100}%; opacity:1; transform:translate(-50%,-50%)`;
+}
+
+function vanish(item) {
+  item.el.style.opacity = 0;
+  item.el.style.transform = 'translate(-50%,-50%) scale(.2)';
+}
+
+function resetStir() { progress = 0; streak = 0; dir = 0; paid = 0; lastAngle = null; }
+
+
+function startForest() {
+  show('forestScene');
+  backdrop(FOREST, GAME_FADE);
+  startCamera();
+  resetStir();
+  inPot = []; held = null;
+  stirMeter.classList.add('hidden');
+  potionResult.classList.add('hidden');
+  recipeBook.classList.add('hidden');
+  counter.classList.remove('hidden');
+  ingredientLayer.classList.remove('hidden');
+  left = items.slice();
+  items.forEach((item, i) => place(item, FOREST_SPOTS[i]));
+  count();
+  say(STORY.forestStart, 4);
+}
+
+function count() {
+  counter.textContent = (items.length - left.length) + ' / ' + items.length;
+}
+
+function gather(handX, handY) {
+  for (const item of left) {
+    if (dist(handX, handY, item.x * innerWidth, item.y * innerHeight) < GRAB) {
+      vanish(item);
+      left = left.filter(other => other !== item);
+      count();
+      if (left.length === 0) {                      // the forest ends only when it is empty
+        const collectedNames = items.map(item =>
+        item.name === 'sap' ? 'resin' : item.name
+        )      ;
+        say(STORY.forestDone, 1);
+        setTimeout(startTower, 2000);
+      } else {
+        say(STORY.grab[item.name], 2);
+      }
+    }
+  }
+}
+
+
+function startTower() {
+  show('towerScene');
+  backdrop(TOWER, 1);
+  counter.classList.add('hidden');
+  ingredientLayer.classList.add('hidden');
+  pauseCamera();
+  cameraView.classList.add('hidden');
+  say(STORY.tower[0], 1);
+  setTimeout(() => say(STORY.tower[1], 1), 2000);
+  timer = setTimeout(() => location.href = 'http://localhost:5174/', TOWER_SECONDS * 1000);
+}
+
+
+function startLab() {
+  show('laboratoryScene');
+  backdrop(LAB, GAME_FADE);
+  startCamera();
+  stirMeter.classList.remove('hidden');
+  recipeBook.classList.remove('hidden');
+  resetLab();
+  say(STORY.lab, 3);
+}
+
+function resetLab() {
+  resetStir();
+  inPot = []; held = null;
+  stirFill.style.width = '0%';
+  potionResult.classList.add('hidden');
+  ingredientLayer.classList.remove('hidden');
+  shelf = items.slice();
+  items.forEach((item, i) => place(item, SHELF_SPOTS[i]));
+}
+
+function finishPotion() {
+  const potion = RECIPES[inPot.slice().sort().join('+')] || { name: 'Strange Brew', line: 'Smells like regret. Nothing thawed.' };
+  discovered[potion.name] = true;
+  potionName.textContent = potion.name;
+  potionLine.textContent = potion.line;
+  hideSpeech();
+  potionResult.classList.remove('hidden');
+  recipeBook.innerHTML = Object.keys(discovered).join('<br>');
+  busy = true;
+  timer = setTimeout(() => { busy = false; resetLab(); say(STORY.again, 3); }, 6000);
+}
+
+function labHand(handX, handY, fist) {
+  if (busy) return;
+
+  if (held) {
+    if (fist) {
+      held.el.classList.add('carried');
+      held.el.style.left = handX + 'px';
+      held.el.style.top = handY + 'px';
+    } else if (dist(handX, handY, potX(), potY()) < POT_MOUTH) {
+      vanish(held);
+      inPot.push(held.name);
+      shelf = shelf.filter(other => other !== held);
+      held = null;
+      say(STORY.drop, 1);
+    } else {
+      place(held, [held.x, held.y]);
+      held = null;
+    }
+    return;
+  }
+
+  if (fist && progress === 0) {              // no picking anything up once stirring has started
+    for (const item of shelf) {
+      if (dist(handX, handY, item.x * innerWidth, item.y * innerHeight) < LAB_GRAB) { held = item; return; }
+    }
+  }
+
+  if (inPot.length > 0) stir(handX, handY);
+  else lastAngle = null;
+}
+
+function stir(handX, handY) {
+  const dx = handX - potX(), dy = handY - potY();
+  const away = Math.hypot(dx, dy);
+
+  if (away < REACH && away > MIN_REACH) {
+    const angle = Math.atan2(dy, dx);
+    if (lastAngle !== null) {
+      let turned = angle - lastAngle;
+      if (turned > Math.PI) turned -= 2 * Math.PI;     // angles wrap from +pi to -pi
+      if (turned < -Math.PI) turned += 2 * Math.PI;
+      const jumped = Math.abs(away - lastDist) / away;
+      if (Math.abs(turned) > 0.015 && Math.abs(turned) < 1.2 && jumped < 0.5) {
+        if (streak === 0) dir = Math.sign(turned);
+        streak += turned * dir;                        // same way adds, turning back subtracts
+        if (streak < 0) { streak = 0; paid = 0; }
+      }
+    }
+    lastAngle = angle;
+    lastDist = away;
+  } else {
+    lastAngle = null;
+  }
+
+  streak = Math.max(0, streak - DRAIN);
+  paid = Math.min(paid, Math.max(0, streak - LEAD));
+
+  const earned = Math.max(0, streak - LEAD);           // banked progress never comes back out
+  if (earned > paid) { progress += earned - paid; paid = earned; }
+
+  stirFill.style.width = Math.min(progress / GOAL, 1) * 100 + '%';
+  if (progress >= GOAL) finishPotion();
+}
+
+
+const hands = new Hands({ locateFile: f => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + f });
+hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
+
+hands.onResults(results => {
+  cameraView.width = handLayer.width = webcam.videoWidth;
+  cameraView.height = handLayer.height = webcam.videoHeight;
+  cameraPen.drawImage(results.image, 0, 0, cameraView.width, cameraView.height);
+
+  const hand = results.multiHandLandmarks[0];
+  if (!hand) {
+    lastAngle = null;
+    if (held) { place(held, [held.x, held.y]); held = null; }
+    return;
+  }
+
+  drawConnectors(handPen, hand, HAND_CONNECTIONS, { color: '#a855f7', lineWidth: 5 });
+  drawLandmarks(handPen, hand, { color: '#d8b4fe', radius: 6 });
+
+  // point 9 is the palm. undo the zoom and cropped edges, then flip x for the mirror.
+  const zoom = Math.max(innerWidth / webcam.videoWidth, innerHeight / webcam.videoHeight);
+  const handX = innerWidth - (hand[9].x * webcam.videoWidth * zoom + (innerWidth - webcam.videoWidth * zoom) / 2);
+  const handY = hand[9].y * webcam.videoHeight * zoom + (innerHeight - webcam.videoHeight * zoom) / 2;
+  const fist = isFist(hand);
+
+  if (scene === 'forestScene' && fist) gather(handX, handY);
+  else if (scene === 'laboratoryScene') labHand(handX, handY, fist);
+});
+
+let watching = false, camOn = false;
+const cam = new Camera(webcam, {
+  onFrame: async () => { if (watching) await hands.send({ image: webcam }); },
+  width: 1280, height: 720
+});
+
+function startCamera() {
+  cameraView.classList.remove('hidden');
+  watching = true;
+  if (!camOn) { camOn = true; cam.start(); }
+}
+
+function pauseCamera() {
+  watching = false;
+  handPen.clearRect(0, 0, handLayer.width, handLayer.height);
+}
+
+startForest();
+</script>
+</body>
+</html>
+<!--Front Page-->
+<section id="frontPage">
+  <h1>Permafrost & Potions</h1>
+  <h3>A Witch's Guide to Success</h3>
+</section>
+
+
+<!--Backstory-->
+<section id="storyScene1" class="scene active">
+  <h1> Time to Explore! </h1>
+  <p> Once upon a time, in a kingdom far, far away, lived an ice witch
+    who lived in a tower.
+    She decided to venture into the enchanted forest to gather more ingredients for her potions.
+  </p>
+  <button id="beginJourney">
+    Continue
+  </button>
+
+</section>
+
+<section id="storyScene2" class="scene active">
+  <p> She realized that the forest had been iced over by the global freezing. She decided to collect frozen organisms to use in her potions. Once she got home she covered them wiht a special type of frost so that they are 
+    enchanted. </p>
+  <button id="beginJourney">
+    Continue
+  </button>
+</section>
+
+<section id="storyScene3" class="scene active">
+  <p>     enchanted. Once she finished, she placed them in her laboratory to begin brewing her potions. (to create an mushroom potion you place it in the vile and stir it with your hand) </p>
+  <button id="beginJourney">
+    Continue to Forest
+  </button>
+</section>
+
+<!--Forest-->
+<section id="forestScene" class="scene">
+  <h1>The Enchanted Forest </h1>
+  <div id="cameraContainer">
+    <video id="cameraFeed" autoplay playsinline></video>
+    <canva></canva>
+  </div>
+
+  <p id="collectionMessage">
+    Search the forest for ingredients.
+  </p>
+
+  <button id="enterTower">
+    Enter Tower
+  </button>
+
+</section>
+
+
+<!--Tower-->
+<section id="towerScene">
+  
+
+</section>
+
+<!--Laboratory-->
+<section id="laboratoryScene">
+
+</section>
+<script type="module" src="js/script.js"></script>
+
+</html>  timer = setTimeout(() => { window.location.href = '/'; }, TOWER_SECONDS * 1000);
