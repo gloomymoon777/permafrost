@@ -153,3 +153,34 @@
     cursor: pointer;
     gap: 0;
 }
+
+.buttonrow {
+    position: relative;
+}
+
+.brewmessage {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 100%;
+    margin-top: 10px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.saved-potions h3 {
+    margin-bottom: 15px;
+}
+
+.saved-potion {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.saved-potion p {
+    margin: 0px;
+    padding-top: 5px;
+}

@@ -127,6 +127,19 @@ function PotionMixing({onBack, ingredients, brewedPotions, setBrewedPotions}) {
 
     const showWater = addedIng.length > 0
 
+    const brewedPotionCounts = brewedPotions.reduce((counts, potion) => {
+        if (!counts[potion.id]) {
+            counts[potion.id] = {
+                ...potion,
+                count: 0
+            }
+        }
+
+        counts[potion.id].count++
+
+        return counts
+    }, {})
+
     return (
         <div className="scene" >
             <button className="backbtn"onClick={onBack}>
@@ -198,7 +211,7 @@ function PotionMixing({onBack, ingredients, brewedPotions, setBrewedPotions}) {
                     <button className="sigil" onClick={() => setAddedIng([])} >dump</button>
                 </div>
                 
-                <p>{brewMessage}</p>
+                <p class="brewmessage">{brewMessage}</p>
               </div>
               
 
@@ -235,18 +248,19 @@ function PotionMixing({onBack, ingredients, brewedPotions, setBrewedPotions}) {
             ))}
 
             <div className="saved-potions">
-                    <h3>brewed potions</h3>
+                <h3>brewed potions</h3>
 
-                    {brewedPotions.length === 0 ? (
-                        <p>no potions brewed yet...</p>
-                    ) : (
-                        brewedPotions.map((potion, index) => (
-                            <div className="saved-potion" key={index}>
-                                <h4>{potion.name}</h4>
-                            </div>
-                        ))
-                    )}
-                </div>
+                {Object.keys(brewedPotionCounts).length === 0 ? (
+                    <p>no potions brewed yet...</p>
+                ) : (
+                    Object.values(brewedPotionCounts).map(potion => (
+                        <div className="saved-potion" key={potion.id}>
+                            <p>{potion.name}</p>
+                            <p>× {potion.count}</p>
+                        </div>
+                    ))
+                )}
+            </div>
             </div>
 
 
