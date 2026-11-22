@@ -30,3 +30,16 @@ how the hand tracking works: mediapipe gives us the position of every finger joi
 
 OPEN https://permafrost-potions.vercel.app/prologue.html
 no api keys or `.env` file are needed. you only need a webcam,( thank you icky google math) and the page needs internet for the hand-tracking scripts.
+
+## what was hard 
+honestly the google java was so hard to link 
+also linking the html to the react native was very hard (we spent all night on that)
+Also adding all the styles and jsx to the folder and like making sure they all link to something + organizing was so hard.
+
+## whats next
+Add a full app with levels 
+freezing and Perma frosting ingredient's with camera
+more recipes
+A LOT MORE RECEPIES
+More ingredients
+better plot!
