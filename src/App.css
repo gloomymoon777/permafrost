@@ -1,5 +1,3 @@
-
-
 .maincontainer {
   display: flex;
   flex-direction: column;
@@ -72,20 +70,17 @@
   justify-self: end;
 }
 
-
 .buttons {
   background: rgba(255,255, 255,0.8);
   font-family: inherit;
   font-size: 20px;
    position: absolute;
    cursor: pointer;
-
 }
 
 .cauldron {
  left: 20%;
   top: 80%;
-
 }
 
 .freezer {
@@ -116,6 +111,7 @@
 .normal-background {
     background-image: url('./assets/finalbg.png');
 }
+
 /* BASE EFFECT CONTAINER */
 .potion-effect {
     position: absolute;
@@ -124,7 +120,6 @@
     pointer-events: none;
     z-index: 1;
 }
-
 
 .effect-frost span {
     position: absolute;
@@ -163,11 +158,9 @@
     width: var(--size);
     height: var(--size);
     background: #a5ed8b;
-
     box-shadow:
         0 0 8px 3px rgba(139, 220, 121, 0.45),
         0 0 18px 6px rgba(61, 155, 72, 0.25);
-
     opacity: 0;
     animation: green-float var(--duration) ease-in-out var(--delay) infinite;
 }
