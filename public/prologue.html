@@ -83,6 +83,7 @@
     position: absolute; 
     width: 14vmin; 
     height: 14vmin; 
+    opacity: 0.6;
     transform: translate(-50%,-50%); 
     transition: all .4s 
   }
@@ -125,22 +126,67 @@
     background: #1e1b4b; 
     border: 4px solid #fff 
   }
-  #counter { left: 50%; transform: translateX(-50%); font-size: clamp(12px, 2.2vmin, 22px); padding: 1.2vmin 2.2vmin }
-  #recipeBook { right: 2vmin; font-size: clamp(8px, 1.4vmin, 13px); padding: 1.4vmin 1.8vmin; line-height: 1.8 }
+  
+  #counter { 
+    left: 50%; 
+    transform: translateX(-50%); 
+    font-size: clamp(12px, 2.2vmin, 22px); 
+    padding: 1.2vmin 2.2vmin 
+  }
+  
+  #recipeBook { 
+    right: 2vmin; 
+    font-size: clamp(8px, 1.4vmin, 13px); 
+    padding: 1.4vmin 1.8vmin; 
+    line-height: 1.8 
+  }
 
-  #speech { position: absolute; left: 50%; bottom: 3vmin; transform: translateX(-50%); width: min(110vmin, 92vw); box-sizing: border-box;
-            background: #1e1b4b; border: 4px solid #fff; box-shadow: inset 0 0 0 3px #4c1d95, 0 0 0 4px #000;
-            padding: 2vmin 2.6vmin; font-size: clamp(10px, 1.9vmin, 18px); line-height: 1.8; min-height: 9vmin }
+  #speech { 
+    position: absolute; 
+    left: 50%; 
+    bottom: 3vmin; 
+    transform: translateX(-50%); 
+    width: min(110vmin, 92vw); 
+    box-sizing: border-box;
+    background: #1e1b4b; 
+    border: 4px solid #fff; 
+    box-shadow: inset 0 0 0 3px #4c1d95, 0 0 0 4px #000;
+    padding: 2vmin 2.6vmin;
+    font-size: clamp(10px, 1.9vmin, 18px); 
+    line-height: 1.8; 
+    min-height: 9vmin 
+  }
 
-  #potionResult { position: absolute; left: 50%; top: 36%; transform: translate(-50%,-50%); text-align: center; width: max-content; max-width: 90vw; box-sizing: border-box;
-                  background: #1e1b4b; border: 4px solid #a855f7; box-shadow: 0 0 0 4px #000; padding: 2.5vmin 4vmin }
-  #potionName { font-size: clamp(16px, 3.4vmin, 36px); line-height: 1.5 }
-  #potionLine { font-size: clamp(9px, 1.7vmin, 16px); margin-top: 1.6vmin; line-height: 1.8; color: #d8b4fe }
+  #potionResult { 
+    position: absolute; 
+    left: 50%; 
+    top: 36%; 
+    transform: translate(-50%,-50%); 
+    text-align: center; 
+    width: max-content; 
+    max-width: 90vw; 
+    box-sizing: border-box;
+    background: #1e1b4b; 
+    border: 4px solid #a855f7; 
+    box-shadow: 0 0 0 4px #000; 
+    padding: 2.5vmin 4vmin 
+  }
+  
+  #potionName { 
+    font-size: clamp(16px, 3.4vmin, 36px); 
+    line-height: 1.5 
+  }
+  
+  #potionLine { 
+    font-size: clamp(9px, 1.7vmin, 16px); 
+    margin-top: 1.6vmin; 
+    line-height: 1.8; 
+    color: #d8b4fe 
+  }
 </style>
 </head>
 
 <body>
-
 <video id="webcam" muted playsinline></video>
 <canvas id="cameraView" class="layer"></canvas>
 
@@ -157,10 +203,8 @@
   <img id="cauldron" src="assets/bottle.png">
 </section>
 
-<!-- the same five pictures are used twice: scattered in the forest, then on the lab shelf -->
 <div id="ingredients" class="layer hidden">
   <img id="cauldron" src="/assets/bottle.png">
-
     <img class="ingredient" data-name="sap" src="/assets/sap.png">
     <img class="ingredient" data-name="blossom" src="/assets/blossom.png">
     <img class="ingredient" data-name="fern" src="/assets/fern.png">
@@ -181,13 +225,12 @@
   </div>
 </div>
 
-<!-- GOOGLE REPO CODEEEEEEE  -->
+<!-- GOOGLE REPO CODEEEEEEE-->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
 <!-- ICKY GOOGLE MATH -->
-
 <script>
 const $ = id => document.getElementById(id);
 const webcam = $('webcam'), cameraView = $('cameraView'), handLayer = $('handLayer');
@@ -200,7 +243,7 @@ const backdrops = document.querySelectorAll('.backdrop');
 
 const FOREST = 0, TOWER = 1, LAB = 2;
 const TOWER_SECONDS = 4;
-const GAME_FADE = 0.4;
+const GAME_FADE = 0.75;
 
 const FOREST_SPOTS = [[.15,.25], [.35,.12], [.65,.12], [.85,.25], [.80,.62]];
 const SHELF_SPOTS  = [[.10,.20], [.28,.15], [.50,.13], [.72,.15], [.90,.20]];
@@ -209,32 +252,17 @@ const SHELF_SPOTS  = [[.10,.20], [.28,.15], [.50,.13], [.72,.15], [.90,.20]];
 const STORY = {
   forestStart: "I'm out of everything, and the whole forest has frozen solid. I need five ingredients.",
   grab: {
-    sap:      "Sap, still sticky under the ice.",
-    blossom:  "A blossom. Somehow it survived the frost.",
-    fern:     "Fern. Smells like spring.",
-    mushroom: "Mushroom. I hope it's the safe kind.",
-    crystal:  "A frost crystal. Of course. My own fault."
+    sap:      "Sap, still sticky under the settling chill.",
+    blossom:  "A blossom. Somehow, it survived the frost of last night.",
+    fern:     "Fern. Reminds me of spring.",
+    mushroom: "Mushroom. Hopefully, it's usable. ",
+    crystal:  "A frost crystal. Of course, I forgot about that."
   },
-  forestDone: "That's all five. Back to the tower.",
+  forestDone: "That's all five. Time to go back to the tower.",
   tower: ["Home. Cold, quiet, a little on fire.", "Let's see if I remember school."],
-  lab: "Let's see what happens if I mix these.",
+  lab: "Let's see what happens if I mix these. Hopefully no explosions...",
   drop: "In it goes.",
   again: "Again. Maybe something different this time."
-};
-
-const RECIPES = {
-  'blossom+sap':        { name: 'Spring Honey',   line: 'The frozen fox shakes off its frost and licks your hand.' },
-  'fern+sap':           { name: 'Thaw Tonic',     line: "A frozen rabbit twitches. It's breathing. Hello, rabbit." },
-  'blossom+fern':       { name: 'Spring Tea',     line: 'A frozen squirrel wakes up and wants a refill.' },
-  'fern+mushroom':      { name: 'Forest Fizz',    line: 'A frozen deer blinks once, then bolts into the trees.' },
-  'blossom+mushroom':   { name: 'Giggle Brew',    line: 'The frozen owl hoots. It sounds a lot like laughing.' },
-  'blossom+crystal':    { name: 'Moonlight Mist', line: 'Snow falls upwards for a moment. Nothing thaws, but it is pretty.' },
-  'crystal+fern':       { name: 'Deep Freeze',    line: 'Oops. The rabbit is frozen again, and colder this time.' },
-  'crystal+sap':        { name: 'Glass Amber',    line: 'The whole cauldron sets solid. You cannot even stir it.' },
-  'crystal+mushroom':   { name: 'Bad Idea',       line: 'It hums. You decide not to drink it.' },
-  'mushroom+sap':       { name: 'Sticky Business', line: 'Everything it touches gets stuck. The bear is stuck, but warm.' },
-  'blossom+fern+sap':   { name: 'Elixir of Spring', line: 'Every frozen animal in this part of the forest wakes up.' },
-  'blossom+crystal+fern+mushroom+sap': { name: 'THE GREAT THAW', line: 'The ice cracks everywhere at once. The whole forest wakes up.' }
 };
 
 // distances scale with the window so it plays the same on any laptop screen
@@ -355,7 +383,7 @@ function gather(handX, handY) {
       if (left.length === 0) {                      // the forest ends only when it is empty
         const collectedNames = items.map(item =>
         item.name === 'sap' ? 'resin' : item.name
-        )      ;
+        );
         say(STORY.forestDone, 1);
         setTimeout(startTower, 2000);
       } else {
@@ -364,7 +392,6 @@ function gather(handX, handY) {
     }
   }
 }
-
 
 function startTower() {
   show('towerScene');
@@ -377,7 +404,6 @@ function startTower() {
   setTimeout(() => say(STORY.tower[1], 1), 2000);
   timer = setTimeout(() => location.href = 'http://localhost:5174/', TOWER_SECONDS * 1000);
 }
-
 
 function startLab() {
   show('laboratoryScene');
@@ -413,19 +439,20 @@ function finishPotion() {
 
 function labHand(handX, handY, fist) {
   if (busy) return;
-
   if (held) {
     if (fist) {
       held.el.classList.add('carried');
       held.el.style.left = handX + 'px';
       held.el.style.top = handY + 'px';
-    } else if (dist(handX, handY, potX(), potY()) < POT_MOUTH) {
+    } 
+    else if (dist(handX, handY, potX(), potY()) < POT_MOUTH) {
       vanish(held);
       inPot.push(held.name);
       shelf = shelf.filter(other => other !== held);
       held = null;
       say(STORY.drop, 1);
-    } else {
+    } 
+    else {
       place(held, [held.x, held.y]);
       held = null;
     }
@@ -474,7 +501,6 @@ function stir(handX, handY) {
   stirFill.style.width = Math.min(progress / GOAL, 1) * 100 + '%';
   if (progress >= GOAL) finishPotion();
 }
-
 
 const hands = new Hands({ locateFile: f => 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/' + f });
 hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.5 });
@@ -531,7 +557,6 @@ startForest();
   <h3>A Witch's Guide to Success</h3>
 </section>
 
-
 <!--Backstory-->
 <section id="storyScene1" class="scene active">
   <h1> Time to Explore! </h1>
@@ -542,7 +567,6 @@ startForest();
   <button id="beginJourney">
     Continue
   </button>
-
 </section>
 
 <section id="storyScene2" class="scene active">
@@ -575,15 +599,11 @@ startForest();
   <button id="enterTower">
     Enter Tower
   </button>
-
 </section>
-
 
 <!--Tower-->
 <section id="towerScene">
-  
-
 </section>
-<script type="module" src="js/script.js"></script>
 
+<script type="module" src="js/script.js"></script>
 </html> 
