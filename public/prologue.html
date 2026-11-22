@@ -6,33 +6,125 @@
 <title>Permafrost &amp; Potions</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: 'Press Start 2P', monospace; color: #fff }
-  .layer { position: absolute; inset: 0; width: 100%; height: 100% }
-  .hidden { display: none }
+  html, body 
+  { 
+    margin: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: #000; 
+    overflow: hidden; 
+    font-family: 'Press Start 2P', monospace; 
+    color: #fff 
+  }
+  
+  .layer { 
+    position: absolute; 
+    inset: 0; 
+    width: 100%; 
+    height: 100% 
+  }
+  
+  .hidden { 
+    display: none
+  }
 
-  #cameraView, #handLayer { transform: scaleX(-1); object-fit: cover }
-  #cameraView { z-index: 1 }
-  #backdrops  { z-index: 2 }
-  #forestScene, #towerScene, #laboratoryScene { z-index: 3 }
-  #ingredients { z-index: 4 }
-  #handLayer { z-index: 5; pointer-events: none }
-  #hud { z-index: 6; pointer-events: none }
+  #cameraView, #handLayer 
+  { 
+    transform: scaleX(-1); 
+    object-fit: cover 
+  }
+  
+  #cameraView { 
+    z-index: 1 
+  }
+  
+  #backdrops  {
+    z-index: 2 
+  }
+  
+  #forestScene, #towerScene, #laboratoryScene { 
+    z-index: 3 
+  }
+  
+  #ingredients {
+    z-index: 4 
+  }
+  
+  #handLayer { 
+    z-index: 5; 
+    pointer-events: none 
+  }
+  
+  #hud { 
+    z-index: 6;
+    pointer-events: none 
+  }
 
-  #webcam { position: absolute; width: 100%; height: 100%; opacity: 0 }
+  #webcam { 
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    opacity: 0 
+  }
 
-  .backdrop { position: absolute; width: 100%; height: 100%; object-fit: cover; display: none; transition: opacity 1s }
-  .backdrop.showing { display: block }
+  .backdrop { 
+    position: absolute; 
+    width: 100%; height: 100%; 
+    object-fit: cover; 
+    display: none; 
+    transition: opacity 1s 
+  }
+  
+  .backdrop.showing { 
+    display: block 
+  }
 
-  .ingredient { position: absolute; width: 14vmin; height: 14vmin; transform: translate(-50%,-50%); transition: all .4s }
-  .ingredient.carried { transition: none; filter: drop-shadow(0 0 14px #a855f7) }
+  .ingredient { 
+    position: absolute; 
+    width: 14vmin; 
+    height: 14vmin; 
+    transform: translate(-50%,-50%); 
+    transition: all .4s 
+  }
+  
+  .ingredient.carried { 
+    transition: none; 
+    filter: drop-shadow(0 0 14px #a855f7) 
+  }
 
-  #cauldron { position: absolute; left: 50%; top: 62%; width: 32vmin; height: 32vmin; transform: translate(-50%,-50%) }
+  #cauldron { 
+    position: absolute; 
+    left: 50%; 
+    top: 62%; 
+    width: 32vmin; 
+    height: 32vmin; 
+    transform: translate(-50%,-50%) 
+  }
 
-  #stirMeter { position: absolute; left: 50%; top: 80%; width: min(40vmin, 60vw); height: 3vmin; transform: translateX(-50%);
-               border: 4px solid #fff; background: #1e1b4b; overflow: hidden }
-  #stirFill { width: 0%; height: 100%; background: #a855f7 }
+  #stirMeter { 
+    position: absolute; 
+    left: 50%; 
+    top: 80%; 
+    width: min(40vmin, 60vw); 
+    height: 3vmin; 
+    transform: translateX(-50%);
+    border: 4px solid #fff; 
+    background: #1e1b4b; 
+    overflow: hidden 
+  }
+  
+  #stirFill { 
+    width: 0%; 
+    height: 100%; 
+    background: #a855f7 
+  }
 
-  #counter, #recipeBook { position: absolute; top: 2vmin; background: #1e1b4b; border: 4px solid #fff }
+  #counter, #recipeBook { 
+    position: absolute; 
+    top: 2vmin; 
+    background: #1e1b4b; 
+    border: 4px solid #fff 
+  }
   #counter { left: 50%; transform: translateX(-50%); font-size: clamp(12px, 2.2vmin, 22px); padding: 1.2vmin 2.2vmin }
   #recipeBook { right: 2vmin; font-size: clamp(8px, 1.4vmin, 13px); padding: 1.4vmin 1.8vmin; line-height: 1.8 }
 
