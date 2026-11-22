@@ -3,9 +3,10 @@
 a webcam game where you play an ice witch, controlling everything with your bare hand: gather ingredients, freeze them, brew potions, and cast spells. made for anyone with a laptop and a webcam.
 
 **live demo:** https://gloomymoon777.github.io/permafrost/prologue.html
-**built by:** isabel (@gloomymoon777), Jaylyn (@jaxbirdros) 
+**built by:** isabel (@gloomymoon777), Jaylyn (@jaxbirdros), Vedanti (@panditvedanti-sys)
 
-![screenshot of the pr
+SCREENSHOT
+https://codehs.com/uploads/4c8c7287113e6ca1607ba883434a841c
 
 ## how do you use it?
 
