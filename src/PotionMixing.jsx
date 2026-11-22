@@ -7,9 +7,9 @@ import bottle from "./assets/bottle.png"
 import water from "./assets/lightened-water.png"
 import grimoire from "./assets/grimoire.png"
 
-const GOAL = 2 * Math.PI * 1.5   // stir 1.5 turns to finish
-const DRAIN = 0.004              // shaky hands don't count
-const LEAD = 0.8                 // radians before a stir starts counting
+const GOAL = 2 * Math.PI * 0.75  // stir three-quarters of a turn to finish
+const DRAIN = 0.001              // progress fades slowly
+const LEAD = 0.2                 // stirring starts counting almost right away
 
 
 
@@ -34,13 +34,6 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
         description: 'a chilling potion infused with frozen minerals; summons snow and ice',
         ingredients: ['crystal', 'resin'],
         color: '#8acde0'
-    },
-    {
-    id: 'rain',
-    name: 'rainfall elixir',
-    description: 'summons a gentle rain, bringing nourishment and renewal to the world.',
-    ingredients: ['mushroom', 'crystal'],
-    color: '#79b9d1'
     },
     {
         id: 'luminescence',
@@ -118,14 +111,14 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
         const dx = hand.x - cx, dy = hand.y - cy
         const away = Math.hypot(dx, dy)
 
-        if (away < box.width * 0.9 && away > box.width * 0.25) {
+        if (away < box.width * 1.5 && away > box.width * 0.08) {
             const angle = Math.atan2(dy, dx)
             if (s.lastAngle !== null) {
                 let turned = angle - s.lastAngle
                 if (turned > Math.PI) turned -= 2 * Math.PI
                 if (turned < -Math.PI) turned += 2 * Math.PI
                 const jumped = Math.abs(away - s.lastDist) / away
-                if (Math.abs(turned) > 0.015 && Math.abs(turned) < 1.2 && jumped < 0.5) {
+                if (Math.abs(turned) > 0.008 && Math.abs(turned) < 2 && jumped < 0.9) {
                     if (s.streak === 0) s.dir = Math.sign(turned)
                     s.streak += turned * s.dir
                     if (s.streak < 0) { s.streak = 0; s.paid = 0 }
