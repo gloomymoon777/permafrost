@@ -1,6 +1,6 @@
 .instruction-box {
     position: fixed;
-    bottom: 22px;
+    bottom: 35px;
     left: 50%;
     transform: translateX(-50%);
 
@@ -15,22 +15,22 @@
     align-items: center;
 
     background: rgba(15, 18, 15, 0.458);
-    border: 2px solid rgba(230, 240, 225, 0.2);
+    border: 2px solid rgba(233, 237, 231, 0.915);
     border-radius: 0;
 
-    color: rgba(245, 245, 235, 0.85);
+    color:  rgba(233, 237, 231, 0.915);
 
     z-index: 1000;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
 
-    backdrop-filter: blur(2px);
 }
 
 .instruction-box p {
     margin: 0;
 
     font-family: inherit;
-    font-size: clamp(14px, 1vw, 17px);
+    font-size: clamp(18px, 1vw, 21px);
     line-height: 1;
     letter-spacing: 0.2px;
 }
@@ -46,4 +46,22 @@
     to {
         visibility: hidden;
     }
+}
+
+.skip-instructions {
+    position: absolute;
+    top: -22px;
+    right: 25px;
+    padding: 3px 0;
+    background: none;
+    border: none;
+    color: rgba(105, 105, 105, 0.971);
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.instruction-box {
+    position: fixed;
 }

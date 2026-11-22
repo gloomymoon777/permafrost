@@ -1,94 +1,135 @@
-import { useState, useEffect } from 'react'
+
+import { useState, useEffect, useRef } from 'react'
 import './InstructionBox.css'
 
-function InstructionBox({ scene, itemsFrozen, brewedPotions }) {
+function InstructionBox({
+    scene,
+    itemsFrozen,
+    brewedPotions,
+    allPotionsTested
+}) {
 
     let message = ''
-let instructionKey = ''
+    let instructionKey = ''
 
-if (scene === 'lab') {
-    if (!itemsFrozen) {
-        instructionKey = 'lab-freeze'
-        message = 'As an ice witch (the best type of witch!), I should frost my ingredients before I start brewing (•̀ᴗ•́ )و'
-    } else if (brewedPotions.length > 0) {
-        instructionKey = 'lab-activate'
-        message = 'I brewed potions! I can test out these spells now (๑ > ᴗ < ๑)'
-    } else {
-        instructionKey = 'lab-brew'
-        message = 'My ingredients are prepared.. Time to enter the cauldron and brew! ( • ̀ω•́ )✧'
+    if (allPotionsTested) {
+        instructionKey = 'ending'
+        message = 'I just tested all the potions I know!! The magic I gathered finally feels at home. I still have lots to learn though.. Perhaps this is only the beginning...'
+    } else if (scene === 'lab') {
+        if (!itemsFrozen) {
+            instructionKey = 'lab-freeze'
+            message = 'As an ice witch (the best type of witch!), I should frost my ingredients before I start brewing (•̀ᴗ•́ )و'
+        } else if (brewedPotions.length > 0) {
+            instructionKey = 'lab-activate'
+            message = 'I brewed potions! I can test out these spells now (๑ > ᴗ < ๑)'
+        } else {
+            instructionKey = 'lab-brew'
+            message = 'My ingredients are prepared.. Time to enter the cauldron and brew! ( • ̀ω•́ )✧'
+        }
     }
-}
 
     const [displayedText, setDisplayedText] = useState('')
     const [visible, setVisible] = useState(false)
+    const [seenInstructions, setSeenInstructions] = useState([])
+    const [skipped, setSkipped] = useState(false)
+    const [textComplete, setTextComplete] = useState(false)
 
-    const [seenInstructions, setSeenInstructions] = useState(() => {
-        return JSON.parse(localStorage.getItem('seenInstructions') || '[]')
-    })
+    const timerRef = useRef(null)
 
-    const [finished, setFinished] = useState(() => {
-        return localStorage.getItem('instructionsCompleted') === 'true'
-    })
-
-    // Show each instruction only once
+    // Typewriter effect
     useEffect(() => {
-        if (!message || finished || seenInstructions.includes(instructionKey)) {
+        if (!message || skipped || seenInstructions.includes(instructionKey)) {
             setVisible(false)
             return
         }
 
         setVisible(true)
         setDisplayedText('')
+        setTextComplete(false)
 
         let index = 0
 
-        const timer = setInterval(() => {
+        clearInterval(timerRef.current)
+
+        timerRef.current = setInterval(() => {
             index++
             setDisplayedText(message.slice(0, index))
 
             if (index >= message.length) {
-                clearInterval(timer)
+                clearInterval(timerRef.current)
+                timerRef.current = null
+                setTextComplete(true)
             }
         }, 30)
 
-        return () => clearInterval(timer)
+        return () => {
+            clearInterval(timerRef.current)
+            timerRef.current = null
+        }
 
-    }, [instructionKey, message, finished, seenInstructions])
+    }, [instructionKey, message, seenInstructions, skipped])
 
-    // Dismiss on any click or tap
+    // Click anywhere to reveal, then click again to dismiss
     useEffect(() => {
         if (!visible) return
 
-        const dismiss = () => {
-            setVisible(false)
+        function handleClick(e) {
+            // Let the SKIP ALL button handle its own click
+            if (e.target.closest?.('.skip-instructions')) return
 
-            const updated = [...seenInstructions, instructionKey]
+            if (!textComplete) {
+                // First click: reveal the entire message
+                clearInterval(timerRef.current)
+                timerRef.current = null
 
-            setSeenInstructions(updated)
-            localStorage.setItem('seenInstructions', JSON.stringify(updated))
+                setDisplayedText(message)
+                setTextComplete(true)
 
-            // Finish instructions after the final activation message
-            if (scene === 'activate') {
-                setFinished(true)
-                localStorage.setItem('instructionsCompleted', 'true')
+            } else {
+                // Second click: dismiss the message
+                setVisible(false)
+
+                setSeenInstructions(prev => {
+                    if (prev.includes(instructionKey)) return prev
+                    return [...prev, instructionKey]
+                })
             }
         }
 
-        window.addEventListener('pointerdown', dismiss)
+        window.addEventListener('pointerdown', handleClick)
 
         return () => {
-            window.removeEventListener('pointerdown', dismiss)
+            window.removeEventListener('pointerdown', handleClick)
         }
 
-    }, [visible, instructionKey, scene, seenInstructions])
+    }, [visible, textComplete, message, instructionKey])
+
+    function skipInstructions(e) {
+        e.stopPropagation()
+
+        clearInterval(timerRef.current)
+        timerRef.current = null
+
+        setSkipped(true)
+        setVisible(false)
+    }
 
     if (!visible || !message) return null
 
     return (
         <div className="instruction-box">
+            <button
+                className="skip-instructions"
+                onClick={skipInstructions}
+            >
+                SKIP ALL
+            </button>
+
             <p>
                 {displayedText}
-                <span className="instruction-cursor">▌</span>
+                {!textComplete && (
+                    <span className="instruction-cursor">▌</span>
+                )}
             </p>
         </div>
     )

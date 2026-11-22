@@ -25,14 +25,14 @@ function PotionMixing({onBack, ingredients, brewedPotions, setBrewedPotions}) {
     },
     {
         id: 'frost',
-        name: 'frostbite elixir',
-        description: 'a chilling potion infused with frozen minerals.',
+        name: 'frostbite essence',
+        description: 'a chilling potion infused with frozen minerals; summons snow and ice',
         ingredients: ['crystal', 'resin'],
         color: '#8acde0'
     },
     {
         id: 'luminescence',
-        name: 'luminescence draught',
+        name: 'luminescence nectar',
         description: 'glows softly in the dark, revealing things hidden from the naked eye.',
         ingredients: ['blossom', 'crystal'],
         color: '#f5e68a'
@@ -46,7 +46,7 @@ function PotionMixing({onBack, ingredients, brewedPotions, setBrewedPotions}) {
     },
     {
         id: 'dream',
-        name: "dreamweaver's brew",
+        name: "dreamweaver's draught",
         description: 'releases a gentle mist that carries the mind into a world of wandering dreams.',
         ingredients: ['blossom', 'resin'],
         color: '#b99ad9'

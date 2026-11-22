@@ -22,6 +22,7 @@ import windowsill from './assets/watercolor.png'
 function App() {
 
     const [itemsFrozen, setItemsFrozen] = useState(false)
+    const [testedPotions, setTestedPotions] = useState([])
 
   
   const ingredients = [
@@ -38,7 +39,6 @@ function App() {
 
 
   function activatePotion(potion) {
-    // Consume exactly one potion
     setBrewedPotions(prev => {
         const index = prev.findIndex(item => item.id === potion.id)
 
@@ -47,7 +47,11 @@ function App() {
         return prev.filter((_, i) => i !== index)
     })
 
-    // Apply the potion's effect
+    setTestedPotions(prev => {
+    if (prev.includes(potion.id)) return prev
+    return [...prev, potion.id]
+    })
+
     if (potion.id === 'restoration') {
         setActivatedPotions([])
     } else {
@@ -63,6 +67,18 @@ function App() {
     setScene('lab')
   }
 
+  const potionTypes = [
+    'restoration',
+    'frost',
+    'luminescence',
+    'evergreen',
+    'dream',
+    'earth'
+    ]
+
+    const allPotionsTested = potionTypes.every(id =>
+        testedPotions.includes(id)
+    )
 
   return (
     <>
@@ -75,7 +91,7 @@ function App() {
         }}
       >
         <header className="header">
-           <h1> - lab 𖤐 coven - </h1>
+           <h1> - tower 𖤐 lab - </h1>
         </header>
 
         <button className="buttons cauldron" onClick={() => setScene('mixing')}>
@@ -150,11 +166,11 @@ function App() {
       )}
 
       <InstructionBox
-            scene={scene}
-            itemsFrozen={itemsFrozen}
-            brewedPotions={brewedPotions}
-            activatedPotions={activatedPotions}
-        />
+          scene={scene}
+          itemsFrozen={itemsFrozen}
+          brewedPotions={brewedPotions}
+          allPotionsTested={allPotionsTested}
+      />
     </>
   )
 }
