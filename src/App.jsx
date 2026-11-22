@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 
 import './App.css'
@@ -7,7 +7,9 @@ import './App.css'
 import PotionMixing from './PotionMixing'
 import Freezer from './Freezer'
 import Activate from './Activate'
-
+import InstructionBox from './InstructionBox'
+import Trace from './Trace'
+import HandCamera from './HandCamera'
 import bottle from "./assets/bottle.png"
 import fern from "./assets/fern.png"
 import crystal from "./assets/crystal.png"
@@ -20,80 +22,112 @@ import windowsill from './assets/watercolor.png'
 
 function App() {
 
-    const [itemsFrozen, setItemsFrozen] = useState(false)
+  const [itemsFrozen, setItemsFrozen] = useState(false)
+  const [testedPotions, setTestedPotions] = useState([])
 
-  
+
   const ingredients = [
-    {id: 'fern', name: 'fern', image: fern, frozen: itemsFrozen, color: '#3e5932'},
-    {id: 'crystal', name: 'crystal', image: crystal, frozen: itemsFrozen, color: '#a8c3cb'},
-    {id: 'resin', name: 'resin', image: resin, frozen: itemsFrozen, color: '#fbfba3'},
-    {id: 'mushroom', name: 'mushroom', image: mushroom, frozen: itemsFrozen, color: '#b0456e'},
-    {id: 'blossom', name: 'blossom', image: blossom, frozen: itemsFrozen, color: '#e8d3db'},
-]
+    { id: 'fern', name: 'fern', image: fern, frozen: itemsFrozen, color: '#3e5932' },
+    { id: 'crystal', name: 'crystal', image: crystal, frozen: itemsFrozen, color: '#a8c3cb' },
+    { id: 'resin', name: 'resin', image: resin, frozen: itemsFrozen, color: '#fbfba3' },
+    { id: 'mushroom', name: 'mushroom', image: mushroom, frozen: itemsFrozen, color: '#b0456e' },
+    { id: 'blossom', name: 'blossom', image: blossom, frozen: itemsFrozen, color: '#e8d3db' },
+  ]
 
   const [scene, setScene] = useState('lab')
   const [brewedPotions, setBrewedPotions] = useState([])
   const [activatedPotions, setActivatedPotions] = useState([])
+  const [pendingPotion, setPendingPotion] = useState(null)
+  const hover = useRef({ el: null, timer: null })
 
+  // hold your hand over a lab button for one second to press it
+  function pointWithHand(hand) {
+    const found = hand ? document.elementFromPoint(hand.x, hand.y) : null
+    const button = found?.closest('.buttons') || null
+    if (button === hover.current.el) return
+    clearTimeout(hover.current.timer)
+    hover.current.el = button
+    if (button) hover.current.timer = setTimeout(() => button.click(), 1000)
+  }
+
+  // drawing the sigil first: the spell only goes off after the glyph is traced
+  function startTrace(potion) {
+    setPendingPotion(potion)
+    setScene('trace')
+  }
 
   function activatePotion(potion) {
-    // Consume exactly one potion
     setBrewedPotions(prev => {
-        const index = prev.findIndex(item => item.id === potion.id)
+      const index = prev.findIndex(item => item.id === potion.id)
 
-        if (index === -1) return prev
+      if (index === -1) return prev
 
-        return prev.filter((_, i) => i !== index)
+      return prev.filter((_, i) => i !== index)
     })
 
-    // Apply the potion's effect
-    if (potion.id === 'restoration') {
-        setActivatedPotions([])
-    } else {
-        setActivatedPotions(prev => {
-            if (prev.some(item => item.id === potion.id)) {
-                return prev
-            }
+    setTestedPotions(prev => {
+      if (prev.includes(potion.id)) return prev
+      return [...prev, potion.id]
+    })
 
-            return [...prev, potion]
-        })
+    if (potion.id === 'restoration') {
+      setActivatedPotions([])
+    } else {
+      setActivatedPotions(prev => {
+        if (prev.some(item => item.id === potion.id)) {
+          return prev
+        }
+
+        return [...prev, potion]
+      })
     }
 
     setScene('lab')
   }
 
+  const potionTypes = [
+    'restoration',
+    'frost',
+    'luminescence',
+    'evergreen',
+    'dream',
+    'earth'
+  ]
+
+  const allPotionsTested = potionTypes.every(id =>
+    testedPotions.includes(id)
+  )
 
   return (
     <>
 
-    {scene === 'lab' && (
-      <main 
-        className="maincontainer" 
-       style={{
-          backgroundImage: `url(${backgroundimg})`
-        }}
-      >
-        <header className="header">
-           <h1> - lab 𖤐 coven - </h1>
-        </header>
+      {scene === 'lab' && (
+        <main
+          className="maincontainer"
+          style={{
+            backgroundImage: `url(${backgroundimg})`
+          }}
+        >
+          <HandCamera onHand={pointWithHand} />
+          <header className="header">
+            <h1> - tower 𖤐 lab - </h1>
+          </header>
 
-        <button className="buttons cauldron" onClick={() => setScene('mixing')}>
-          enter cauldron
-        </button>
+          <button className="buttons cauldron" onClick={() => setScene('mixing')}>
+            enter cauldron
+          </button>
 
-        <button className="buttons freezer" onClick={() => setScene('freezer')}>
-          freeze materials
-        </button>
+          <button className="buttons freezer" onClick={() => setScene('freezer')}>
+            freeze materials
+          </button>
 
-        <button className="buttons activate" onClick={() => setScene('activate')}>
-          activate spells 
-        </button>
+          <button className="buttons activate" onClick={() => setScene('activate')}>
+            activate spells
+          </button>
 
-        {activatedPotions.map(potion => (
-            <div
-                key={potion.id}
-                className={`potion-effect effect-${potion.id}`}
-            >
+          {activatedPotions.map(potion => (
+            <div key={potion.id} className={`potion-effect effect-${potion.id}`}>
+
                 {['frost', 'evergreen', 'luminescence'].includes(potion.id) &&
                   Array.from({ length: 35 }).map((_, i) => (
                       <span
@@ -109,46 +143,79 @@ function App() {
                       />
                   ))
               }
-            </div>
-        ))}
-      </main>
-    
-    )}
-    
-     {scene === 'mixing' && (
-      <PotionMixing
-          ingredients={ingredients}
-          brewedPotions={brewedPotions}
-          setBrewedPotions={setBrewedPotions}
-          onBack={() => setScene('lab')}
-      />
-    )}
+
+            {potion.id === 'rain' && (
+                Array.from({ length: 100 }).map((_, i) => (
+                    <div
+                        key={i}
+                        className="rain-drop"
+                        style={{
+                            '--x': `${(i * 37) % 100}%`,
+                            '--delay': `${-((i * 17) % 20) / 10}s`,
+                            '--duration': `${0.65 + (i * 13 % 50) / 100}s`,
+                            '--drift': `${15 + (i * 7 % 15)}px`,
+                            '--length': `${35 + (i * 11 % 35)}px`
+                        }}
+                    >
+                        <div className="rain-stem" />
+                    </div>
+                ))
+            )}
+
+        </div>
+                ))}
+            </main>
+
+          )}
+
+          {scene === 'mixing' && (
+            <PotionMixing
+              ingredients={ingredients}
+              brewedPotions={brewedPotions}
+              setBrewedPotions={setBrewedPotions}
+              onBack={() => setScene('lab')}
+            />
+          )}
 
 
-      {scene === 'freezer' && (
-        <Freezer
-            ingredients={ingredients}
-            onBack={() => setScene('lab')}
-            itemsFrozen={itemsFrozen}
-            setItemsFrozen={setItemsFrozen}
-        />
-      )}
+          {scene === 'freezer' && (
+            <Freezer
+              ingredients={ingredients}
+              onBack={() => setScene('lab')}
+              itemsFrozen={itemsFrozen}
+              setItemsFrozen={setItemsFrozen}
+            />
+          )}
 
 
-      {scene === 'activate' && (
-          <main
+          {scene === 'activate' && (
+            <main
               className="maincontainer"
               style={{ backgroundImage: `url(${windowsill})` }}
-          >
+            >
               <Activate
-                  brewedPotions={brewedPotions}
-                  onBack={() => setScene('lab')}
-                  onActivate={activatePotion}
+                brewedPotions={brewedPotions}
+                onBack={() => setScene('lab')}
+                onActivate={startTrace}
               />
-          </main>
-      )}
-    </>
-  )
-}
+            </main>
+          )}
 
-export default App
+          {scene === 'trace' && (
+            <Trace
+              onDone={() => activatePotion(pendingPotion)}
+              onBack={() => setScene('activate')}
+            />
+          )}
+
+          <InstructionBox
+            scene={scene}
+            itemsFrozen={itemsFrozen}
+            brewedPotions={brewedPotions}
+            allPotionsTested={allPotionsTested}
+          />
+        </>
+      )
+      }
+
+      export default App
