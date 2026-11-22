@@ -170,12 +170,13 @@ function App() {
 
           {scene === 'mixing' && (
             <PotionMixing
-              ingredients={ingredients}
-              brewedPotions={brewedPotions}
-              setBrewedPotions={setBrewedPotions}
-              onBack={() => setScene('lab')}
+                onBack={() => setScene('lab')}
+                ingredients={ingredients}
+                brewedPotions={brewedPotions}
+                setBrewedPotions={setBrewedPotions}
             />
-          )}
+        )}
+         
 
 
           {scene === 'freezer' && (
@@ -208,12 +209,14 @@ function App() {
             />
           )}
 
-          <InstructionBox
-            scene={scene}
-            itemsFrozen={itemsFrozen}
-            brewedPotions={brewedPotions}
-            allPotionsTested={allPotionsTested}
-          />
+          {scene !== 'mixing' && (
+              <InstructionBox
+                  scene={scene}
+                  itemsFrozen={itemsFrozen}
+                  brewedPotions={brewedPotions}
+                  allPotionsTested={allPotionsTested}
+              />
+          )}
         </>
       )
       }

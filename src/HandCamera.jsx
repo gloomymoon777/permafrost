@@ -43,7 +43,7 @@ export default function HandCamera({ onHand, showFeed }) {
         const w = el.videoWidth, h = el.videoHeight
         feed.current.width = skeleton.current.width = w
         feed.current.height = skeleton.current.height = h
-        if (showFeed) feed.current.getContext('2d').drawImage(results.image, 0, 0, w, h)
+        feed.current.getContext('2d').clearRect(0, 0, w, h)
 
         const hand = results.multiHandLandmarks[0]
         if (!hand) return latest.current(null)
@@ -80,7 +80,7 @@ export default function HandCamera({ onHand, showFeed }) {
   return (
     <>
       <video ref={video} muted playsInline style={{ position: 'fixed', width: 2, height: 2, opacity: 0 }} />
-      <canvas ref={feed} className="hand-feed" hidden={!showFeed} />
+      <canvas ref={feed} className="hand-feed" hidden />
       <canvas ref={skeleton} className="hand-skeleton" />
     </>
   )

@@ -2,6 +2,7 @@
 import './PotionMixing.css'
 import { useState, useRef } from 'react'
 import HandCamera from './HandCamera'
+import InstructionBox from './InstructionBox'
 
 import bottle from "./assets/bottle.png"
 import water from "./assets/lightened-water.png"
@@ -19,6 +20,9 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
     const [grimoireOpen, setGrimoireOpen] = useState(false)
 
     const [brewMessage, setBrewMessage] = useState('')
+
+    const [isStirring, setIsStirring] = useState(false)
+
 
     const recipes = [
     {
@@ -94,6 +98,17 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
         addIngredient(e.dataTransfer.getData('ingredient'))
     }
 
+    function startStirring() {
+        if (addedIng.length === 0) {
+            setBrewMessage('add ingredients before stirring...')
+            return
+        }
+
+        setIsStirring(true)
+        setBrewMessage('')
+        resetStir()
+    }
+
     // hand tracking: fist on an ingredient to pick it up, open hand over the bottle to drop it.
     // an open hand circling the bottle stirs it. when the bar fills, the potion finishes.
     const held = useRef(null)
@@ -108,6 +123,7 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
 
     function finishStir() {
         resetStir()
+        setIsStirring(false)
         finishPotion()
     }
 
@@ -171,7 +187,7 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
         }
 
         if (hand.fist) {
-            if (stirRef.current.progress > 0) return   // no picking up once stirring has started
+            if (isStirring) return  
 
             for (const el of document.querySelectorAll('.ingredient')) {
                 const box = el.getBoundingClientRect()
@@ -188,7 +204,9 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
             return
         }
 
-        if (addedIng.length > 0) stir(hand)
+        if (isStirring && addedIng.length > 0) {
+                stir(hand)
+            }
     }
 
     function hex2rgb(hex) {
@@ -248,13 +266,13 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
 
     return (
         <div className="scene" >
-            <HandCamera onHand={handleHand} showFeed />
+            <HandCamera onHand={handleHand} />
             <img ref={floater} className="held-ingredient" hidden />
             <button className="backbtn"onClick={onBack}>
                 back to lab
             </button>
 
-            <header className="header"><h1>- brewing 𖤐 cauldron - </h1><p>click and drag ingredient combos into the bottle! (check book for recipes)</p></header>
+            <header className="header"><h1>- brewing 𖤐 cauldron - </h1><p>hover by opening your palm. grab items by making a fist, and release  (check book for recipes)</p></header>
             
             <section className="content">
           <aside className="ingredients">
@@ -316,13 +334,33 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
 
               <div className="buttonrow">
                 <div>
-                    <button className="sigil" onClick={finishStir}>stir to finish!</button>
-                    <button className="sigil" onClick={() => { setAddedIng([]); resetStir() }}>dump</button>
+                    <button className="sigil" onClick={startStirring}>
+                        stir to finish!
+                    </button>
+
+                    <button
+                        className="sigil"
+                        onClick={() => {
+                            setAddedIng([])
+                            resetStir()
+                            setIsStirring(false)
+                        }}
+                    >
+                        dump
+                    </button>
                 </div>
-                <div className="stir-meter"><div className="stir-fill" style={{ width: stirPct * 100 + '%' }} /></div>
-                
-                <p class="brewmessage">{brewMessage}</p>
-              </div>
+
+                {isStirring && (
+                    <div className="stir-meter">
+                        <div
+                            className="stir-fill"
+                            style={{ width: `${stirPct * 100}%` }}
+                        />
+                    </div>
+                )}
+
+                <p className="brewmessage">{brewMessage}</p>
+            </div>
               
 
               
@@ -384,9 +422,16 @@ function PotionMixing({onBack, ingredients, brewedPotions = [], setBrewedPotions
 
         </section>
 
-
+        <InstructionBox
+            scene="mixing"
+            isStirring={isStirring}
+            itemsFrozen={false}
+            brewedPotions={brewedPotions}
+        />
 
         </div>
+
+        
     )
 }
 

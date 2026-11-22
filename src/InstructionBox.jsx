@@ -6,8 +6,9 @@ function InstructionBox({
     scene,
     itemsFrozen,
     brewedPotions,
-    allPotionsTested
-}) {
+    allPotionsTested,
+    isStirring
+})  {
 
     let message = ''
     let instructionKey = ''
@@ -26,6 +27,9 @@ function InstructionBox({
             instructionKey = 'lab-brew'
             message = 'My ingredients are prepared.. Time to enter the cauldron and brew! ( • ̀ω•́ )✧'
         }
+    } else if (scene === 'mixing' && isStirring) {
+        instructionKey = 'mixing-stir'
+        message = 'The ingredients are ready! point your index finger at the brew and move it in a circle until the meter fills!'
     }
 
     const [displayedText, setDisplayedText] = useState('')

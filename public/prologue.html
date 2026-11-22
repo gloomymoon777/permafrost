@@ -200,16 +200,16 @@
 <section id="towerScene" class="layer hidden"></section>
 
 <section id="laboratoryScene" class="layer hidden">
-  <img id="cauldron" src="assets/bottle.png">
+  <img id="cauldron" src="./assets/bottle.png">
 </section>
 
 <div id="ingredients" class="layer hidden">
-  <img id="cauldron" src="/assets/bottle.png">
-    <img class="ingredient" data-name="sap" src="/assets/sap.png">
-    <img class="ingredient" data-name="blossom" src="/assets/blossom.png">
-    <img class="ingredient" data-name="fern" src="/assets/fern.png">
-    <img class="ingredient" data-name="mushroom" src="/assets/mushroom.png">
-    <img class="ingredient" data-name="crystal" src="/assets/crystal.png">
+  <img id="cauldron" src="./assets/bottle.png">
+    <img class="ingredient" data-name="sap" src="./assets/sap.png">
+    <img class="ingredient" data-name="blossom" src="./assets/blossom.png">
+    <img class="ingredient" data-name="fern" src="./assets/fern.png">
+    <img class="ingredient" data-name="mushroom" src="./assets/mushroom.png">
+    <img class="ingredient" data-name="crystal" src="./assets/crystal.png">
 </div>
 
 <canvas id="handLayer" class="layer"></canvas>
@@ -402,8 +402,10 @@ function startTower() {
   cameraView.classList.add('hidden');
   say(STORY.tower[0], 1);
   setTimeout(() => say(STORY.tower[1], 1), 2000);
-  timer = setTimeout(() => location.href = 'http://localhost:5174/', TOWER_SECONDS * 1000);
-}
+  timer = setTimeout(() => {
+      window.location.assign('/');
+  }, TOWER_SECONDS * 1000);
+  }
 
 function startLab() {
   show('laboratoryScene');
@@ -606,4 +608,5 @@ startForest();
 </section>
 
 <script type="module" src="js/script.js"></script>
+<script type="module" src="/src/main.jsx"></script>
 </html> 

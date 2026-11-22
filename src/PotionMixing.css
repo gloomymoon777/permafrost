@@ -192,5 +192,20 @@
 .held-ingredient { position: fixed; z-index: 70; width: 100px; transform: translate(-50%, -50%); pointer-events: none;
                    filter: drop-shadow(0 0 14px #a855f7) }
 
-.stir-meter { width: 300px; height: 14px; border: 3px solid #fff; background: #1e1b4b; margin: 10px auto; overflow: hidden }
-.stir-fill { height: 100%; background: #a855f7; transition: width .1s }
+.stir-meter {
+    width: 220px;
+    height: 10px;
+    border: 2px solid rgba(58, 99, 122, 0.65);
+    background: rgba(205, 220, 226, 0.2);
+    overflow: hidden;
+    box-sizing: border-box;
+    margin: 12px auto;
+}
+
+.stir-fill {
+    height: 100%;
+    width: 0%;
+    background: rgba(23, 89, 113, 0.588);
+    transition: width 0.15s ease;
+    box-shadow: 0 0 5px rgba(173, 207, 221, 0.35);
+}
