@@ -276,10 +276,9 @@
     <h1>Time to Explore!</h1>
     <div class="dialogueBox">
       Once upon a time, in a kingdom far, far away,
-      lived an ice witch in a tower.
+      lived a newly fledged ice witch.
 
-      She decided to venture into the enchanted forest
-      to gather more ingredients for her potions.
+      She was deployed by the Kingdom to a desolate countryside to conduct research on cryokinesis and potential energy sources..
     <br>
     <button onclick="playClick(); showIntroPage('storyPage2')">
       Continue
@@ -293,11 +292,9 @@
   <div id="storyPage2" class="introPage hidden">
     <h1>The Frozen Forest</h1>
     <div class="dialogueBox">
-      She realized that the forest had been iced over
-      by the global freezing.
+      Luckily, the cold forest already had frozen potion ingredients!
 
-      She decided to collect frozen organisms to use
-      in her potions. Once she got home, she covered
+      Once she got home, she would cover
       them with a special type of frost so that they
       would become enchanted.
     <br>
@@ -313,11 +310,7 @@
   <div id="storyPage3" class="introPage hidden">
     <h1>Back to the Laboratory</h1>
     <div class="dialogueBox">
-      Once she finished collecting the ingredients,
-      she placed them in her laboratory to begin
-      brewing her potions.
-
-      But what kind of magic would she create?
+      But what kind of magic would she create? And importantly, how should she decorate her new room?
     <br>
     <button onclick="playClick(); showIntroPage('forestPage')">
       Continue
@@ -331,12 +324,11 @@
   <div id="forestPage" class="introPage hidden">
     <h1>Your Journey Begins</h1>
     <p>
-      Collect the ingredients and help the ice witch
-      restore her magical world!
+      Collect the ingredients and create your magical world!
     </p>
 
     <button onclick="playClick(); beginGame()">
-      Go to the Forest
+      To the Forest
     </button>
 
   </div>
@@ -434,7 +426,7 @@ const SHELF_SPOTS  = [[.10,.20], [.28,.15], [.50,.13], [.72,.15], [.90,.20]];
 
 // story: a beginner ice witch, a frozen forest, and a lot of frozen animals
 const STORY = {
-  forestStart: "I'm out of everything, and the whole forest has frozen solid. I need five ingredients.",
+  forestStart: "First up, ingredients! Now where can I find some...",
   grab: {
     sap:      "Sap, still sticky under the settling chill.",
     blossom:  "A blossom. Somehow, it survived the frost of last night.",
