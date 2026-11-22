@@ -184,6 +184,8 @@
     color: #d8b4fe 
   }
 
+
+
 /* INTRO PAGES */
 #introScreens {
   position: fixed;
@@ -192,18 +194,30 @@
   background: transparent;
 }
 
+
 .introPage {
   position: absolute;
   inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  gap: 3vmin;
+  padding: 5vmin;
+  box-sizing: border-box;
+}
+
+.introPage.hidden {
+  display: none;
 }
 
 .introPage h1 {
-  position: absolute;
-  top: 15%;
+  position: static;
   width: 100%;
   color: #d8b4fe;
   font-size: clamp(22px, 5vmin, 48px);
+  margin: 0;
 }
 
 .introPage .dialogueBox {
@@ -220,17 +234,22 @@
   font-size: clamp(10px, 1.9vmin, 18px);
   line-height: 1.8;
   min-height: 15vmin;
+  text-align: center;
 }
 
-.introPage button {
-  margin-top: 2vmin;
-  padding: 1.5vmin 3vmin;
-  background: #6b4c9a;
-  color: white;
-  border: 3px solid white;
-  font-family: inherit;
-  cursor: pointer;
+.introPage h2 {
+  margin: 0;
 }
+
+.introPage .teamNames {
+  margin: 0;
+}
+
+.introPage > p {
+  margin: 0;
+  line-height: 2;
+}
+
 
 .teamNames {
   color: #d8b4fe;
@@ -239,19 +258,50 @@
 }
 
 .introPage button {
-  margin-top: 3vmin;
-  padding: 2vmin 4vmin;
+  position: static;
+  display: block;
+  align-self: center;
+  margin: 2vmin auto;
   background: #6b4c9a;
   color: white;
   border: 3px solid white;
   font-family: inherit;
   font-size: clamp(10px, 1.8vmin, 16px);
   cursor: pointer;
+  padding: 1.5vmin 3vmin;
 }
 
 .introPage button:hover {
   background: #a855f7;
-  transform: scale(1.05);
+  transform: scale(1.05)
+}
+
+#storyPage1,
+#storyPage2,
+#storyPage3 {
+  justify-content: flex-start;
+  padding-top: 18vh;
+  gap: 8vh;
+}
+
+#storyPage1 .dialogueBox,
+#storyPage2 .dialogueBox,
+#storyPage3 .dialogueBox {
+  position: static;
+  transform: none;
+  margin: 0 auto;
+  width: min(850px, 85vw);
+  min-height: 20vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3vmin;
+  box-sizing: border-box;
+}
+
+.dialogueBox button {
+  margin: 3vmin auto 0;
 }
 </style>
 </head>
@@ -266,8 +316,8 @@
     <div class="teamNames">
       Created by: Isabel, Jaylyn, and Vedanti
     </div>
-    <button onclick="playClick(); playMusic('intro'); showIntroPage('storyPage1')">
-      Let's Go!
+    <button class="gobutton" onclick="playClick(); playMusic('intro'); showIntroPage('storyPage1')">
+      <p>Let's Go!</p>
     </button>
   </div>
 
@@ -276,9 +326,9 @@
     <h1>Time to Explore!</h1>
     <div class="dialogueBox">
       Once upon a time, in a kingdom far, far away,
-      lived a newly fledged ice witch.
+      there lived a newly fledged ice witch.
 
-      She was deployed by the Kingdom to a desolate countryside to conduct research on cryokinesis and potential energy sources..
+      She was deployed by the Kingdom to a desolate northern countryside to conduct research on cryokinesis and potential energy sources..
     <br>
     <button onclick="playClick(); showIntroPage('storyPage2')">
       Continue
@@ -292,11 +342,10 @@
   <div id="storyPage2" class="introPage hidden">
     <h1>The Frozen Forest</h1>
     <div class="dialogueBox">
-      Luckily, the cold forest already had frozen potion ingredients!
+      Luckily, the cold forest already had frozen ingredients!
 
-      Once she got home, she would cover
-      them with a special type of frost so that they
-      would become enchanted.
+      Once she arrived to her royal mage tower, she would enchant
+      them with a special type of frost to prepare them for potion making..
     <br>
     <button onclick="playClick(); showIntroPage('storyPage3')">
       Continue
@@ -308,7 +357,7 @@
 
   <!-- BACKSTORY PART 3 -->
   <div id="storyPage3" class="introPage hidden">
-    <h1>Back to the Laboratory</h1>
+    <h1>The Frozen Forest</h1>
     <div class="dialogueBox">
       But what kind of magic would she create? And importantly, how should she decorate her new room?
     <br>
@@ -434,8 +483,8 @@ const STORY = {
     mushroom: "Mushroom. Hopefully, it's usable. ",
     crystal:  "A frost crystal. Of course, I forgot about that."
   },
-  forestDone: "That's all five. Time to go back to the tower.",
-  tower: ["Home. Cold, quiet, a little on fire.", "Let's see if I remember school."],
+  forestDone: "I think that's enough! Time to go to the tower.",
+  tower: [".", "Let's see if I remember what I've learned (gulp)."],
   lab: "Let's see what happens if I mix these. Hopefully no explosions...",
   drop: "In it goes.",
   again: "Again. Maybe something different this time."
